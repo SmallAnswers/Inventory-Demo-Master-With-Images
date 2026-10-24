@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -34,7 +36,8 @@
       margin-top: 14px;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -92,18 +95,35 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      z-index: 1000;
     }
 
     .modal {
       background: white;
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
+      max-height: 85vh;
+      overflow-y: auto;
       border-radius: 15px;
       padding: 22px;
     }
 
     .warning {
       color: #c0392b;
+    }
+
+    .warning-box {
+      padding: 10px;
+      background: #fff4f3;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .plan-box {
+      padding: 10px;
+      background: #fff9e6;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
 
     .modal-buttons {
@@ -129,47 +149,68 @@
   <h2>Withdraw Items</h2>
 
   <label>Name</label>
-  <input id="name">
+
+  <input
+    id="name"
+    placeholder="Person withdrawing"
+  >
+
 
   <label>
     Order
-    <span class="optional">(Optional)</span>
+    <span class="optional">
+      (Optional)
+    </span>
   </label>
 
   <input
     id="orderSearch"
-    placeholder="Search order..."
+    placeholder="Search Order ID or Order Name..."
     oninput="filterOrders()"
   >
 
   <select id="orderSelect">
+
     <option value="">
       No Order / Ad-hoc
     </option>
+
   </select>
 
+
   <div id="itemsContainer"></div>
+
 
   <button
     class="add"
     onclick="addRow()">
+
     + Add Item
+
   </button>
+
 
   <button
     class="submit"
     onclick="submitAll(false)">
+
     Confirm Withdrawal
+
   </button>
+
 
   <button
     class="back"
     onclick="location.href='index.html'">
+
     Back
+
   </button>
 
 </div>
 
+
+<!-- WARNING -->
 
 <div
   id="warningModal"
@@ -178,14 +219,16 @@
   <div class="modal">
 
     <h3 class="warning">
-      ⚠️ Insufficient Stock
+      ⚠️ Withdrawal Warning
     </h3>
 
-    <div id="warningContent"></div>
+    <div id="stockWarnings"></div>
+
+    <div id="planWarnings"></div>
 
     <p>
-      Continuing will allow the affected
-      inventory quantities to become negative.
+      You can cancel and adjust the withdrawal,
+      or continue anyway.
     </p>
 
     <div class="modal-buttons">
@@ -193,13 +236,17 @@
       <button
         class="cancel"
         onclick="closeWarning()">
+
         Cancel
+
       </button>
 
       <button
         class="anyway"
         onclick="withdrawAnyway()">
+
         Withdraw Anyway
+
       </button>
 
     </div>
@@ -214,12 +261,14 @@
 const API_URL =
 "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
 
+
 let inventory = [];
+
 let orders = [];
 
 
 // =====================================================
-// LOAD
+// LOAD PAGE
 // =====================================================
 
 async function loadPage() {
@@ -243,6 +292,7 @@ async function loadPage() {
     const inventoryData =
       await inventoryResponse.json();
 
+
     const orderData =
       await ordersResponse.json();
 
@@ -255,13 +305,20 @@ async function loadPage() {
       orderData.orders || [];
 
 
-    renderOrders(orders);
+    renderOrders(
+      orders
+    );
+
 
     addRow();
 
+
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Could not load inventory."
@@ -276,12 +333,18 @@ async function loadPage() {
 // ORDERS
 // =====================================================
 
-function renderOrders(list) {
+function renderOrders(
+  list
+) {
 
   const select =
     document.getElementById(
       "orderSelect"
     );
+
+
+  const current =
+    select.value;
 
 
   select.innerHTML =
@@ -290,25 +353,42 @@ function renderOrders(list) {
     </option>`;
 
 
-  list.forEach(order => {
+  list.forEach(
+    order => {
 
-    const option =
-      document.createElement(
-        "option"
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        order.orderId;
+
+
+      option.textContent =
+        `${order.orderId} — ${order.orderName}`;
+
+
+      select.appendChild(
+        option
       );
 
-
-    option.value =
-      order.orderId;
-
-
-    option.textContent =
-      `${order.orderId} — ${order.orderName}`;
+    }
+  );
 
 
-    select.appendChild(option);
-
-  });
+  if (
+    [...select.options]
+      .some(
+        option =>
+          option.value ===
+          current
+      )
+  ) {
+    select.value =
+      current;
+  }
 
 }
 
@@ -326,28 +406,36 @@ function filterOrders() {
 
 
   const filtered =
-    orders.filter(order => {
+    orders.filter(
+      order => {
 
-      return (
-        order.orderName
-          .toLowerCase()
-          .includes(search)
-        ||
-        order.orderId
-          .toLowerCase()
-          .includes(search)
-      );
+        return (
+          order.orderName
+            .toLowerCase()
+            .includes(
+              search
+            )
+          ||
+          order.orderId
+            .toLowerCase()
+            .includes(
+              search
+            )
+        );
 
-    });
+      }
+    );
 
 
-  renderOrders(filtered);
+  renderOrders(
+    filtered
+  );
 
 }
 
 
 // =====================================================
-// ITEM ROW
+// ITEM ROWS
 // =====================================================
 
 function addRow() {
@@ -370,10 +458,11 @@ function addRow() {
 
   const options =
     inventory
-      .map(i =>
-        `<option value="${escapeHtml(i.name)}">
-          ${escapeHtml(i.name)} (${i.qty})
-        </option>`
+      .map(
+        i =>
+          `<option value="${escapeHtml(i.name)}">
+            ${escapeHtml(i.name)} (${i.qty})
+          </option>`
       )
       .join("");
 
@@ -395,21 +484,29 @@ function addRow() {
     <button
       class="remove"
       type="button">
+
       Remove
+
     </button>
 
   `;
 
 
   div
-    .querySelector(".remove")
+    .querySelector(
+      ".remove"
+    )
     .onclick =
       function() {
+
         div.remove();
+
       };
 
 
-  container.appendChild(div);
+  container.appendChild(
+    div
+  );
 
 }
 
@@ -429,35 +526,41 @@ function getItems() {
   const items = [];
 
 
-  rows.forEach(row => {
+  rows.forEach(
+    row => {
 
-    const item =
-      row.querySelector(
-        ".item"
-      ).value;
-
-
-    const qty =
-      Number(
-        row.querySelector(
-          ".qty"
-        ).value
-      );
+      const item =
+        row
+          .querySelector(
+            ".item"
+          )
+          .value;
 
 
-    if (
-      item &&
-      qty > 0
-    ) {
+      const qty =
+        Number(
+          row
+            .querySelector(
+              ".qty"
+            )
+            .value
+        );
 
-      items.push({
-        item: item,
-        qty: qty
-      });
+
+      if (
+        item &&
+        qty > 0
+      ) {
+
+        items.push({
+          item: item,
+          qty: qty
+        });
+
+      }
 
     }
-
-  });
+  );
 
 
   return items;
@@ -469,18 +572,27 @@ function getItems() {
 // SUBMIT
 // =====================================================
 
-async function submitAll(force) {
+async function submitAll(
+  force
+) {
 
   const name =
     document
-      .getElementById("name")
+      .getElementById(
+        "name"
+      )
       .value
       .trim();
 
 
   if (!name) {
-    alert("Enter name");
+
+    alert(
+      "Enter name."
+    );
+
     return;
+
   }
 
 
@@ -491,10 +603,13 @@ async function submitAll(force) {
   if (
     items.length === 0
   ) {
+
     alert(
-      "Add at least one item."
+      "Add at least one item and quantity."
     );
+
     return;
+
   }
 
 
@@ -502,7 +617,8 @@ async function submitAll(force) {
     document
       .getElementById(
         "orderSelect"
-      ).value;
+      )
+      .value;
 
 
   const url =
@@ -516,7 +632,9 @@ async function submitAll(force) {
   try {
 
     const response =
-      await fetch(url);
+      await fetch(
+        url
+      );
 
 
     const data =
@@ -528,14 +646,18 @@ async function submitAll(force) {
     ) {
 
       showWarning(
-        data.shortages || []
+        data.shortages || [],
+        data.planExcesses || []
       );
 
       return;
+
     }
 
 
-    if (!data.success) {
+    if (
+      !data.success
+    ) {
 
       alert(
         data.error ||
@@ -543,6 +665,7 @@ async function submitAll(force) {
       );
 
       return;
+
     }
 
 
@@ -557,7 +680,10 @@ async function submitAll(force) {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Withdrawal failed."
@@ -569,39 +695,162 @@ async function submitAll(force) {
 
 
 // =====================================================
-// WARNING
+// WARNINGS
 // =====================================================
 
 function showWarning(
-  shortages
+  shortages,
+  planExcesses
 ) {
 
-  const content =
+  const stockContainer =
     document.getElementById(
-      "warningContent"
+      "stockWarnings"
     );
 
 
-  content.innerHTML = "";
+  const planContainer =
+    document.getElementById(
+      "planWarnings"
+    );
 
 
-  shortages.forEach(item => {
+  stockContainer.innerHTML = "";
 
-    const p =
-      document.createElement("p");
-
-
-    p.innerHTML =
-      `<strong>${escapeHtml(item.item)}</strong><br>` +
-      `Available: ${item.available}<br>` +
-      `Requested: ${item.requested}<br>` +
-      `<strong>Shortfall: ${item.shortfall}</strong><br>` +
-      `New stock: ${item.newQty}`;
+  planContainer.innerHTML = "";
 
 
-    content.appendChild(p);
+  // STOCK WARNING
 
-  });
+  if (
+    shortages.length > 0
+  ) {
+
+    stockContainer.innerHTML =
+      `<h4>Stock Shortfall</h4>`;
+
+
+    shortages.forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "warning-box";
+
+
+        div.innerHTML = `
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Available:
+          ${item.available}
+
+          <br>
+
+          Requested:
+          ${item.requested}
+
+          <br>
+
+          <strong>
+            Shortfall:
+            ${item.shortfall}
+          </strong>
+
+          <br>
+
+          Stock after withdrawal:
+          ${item.newQty}
+
+        `;
+
+
+        stockContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
+
+
+  // PLAN WARNING
+
+  if (
+    planExcesses.length > 0
+  ) {
+
+    planContainer.innerHTML =
+      `<h4>Order Plan Exceeded</h4>`;
+
+
+    planExcesses.forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "plan-box";
+
+
+        div.innerHTML = `
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Planned:
+          ${item.planned}
+
+          <br>
+
+          Already withdrawn:
+          ${item.withdrawnSoFar}
+
+          <br>
+
+          Remaining planned:
+          ${item.remainingPlanned}
+
+          <br>
+
+          Requested now:
+          ${item.requested}
+
+          <br>
+
+          <strong>
+            Exceeds plan by:
+            ${item.exceedsBy}
+          </strong>
+
+        `;
+
+
+        planContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
 
 
   document
@@ -630,7 +879,10 @@ async function withdrawAnyway() {
 
   closeWarning();
 
-  await submitAll(true);
+
+  await submitAll(
+    true
+  );
 
 }
 
@@ -639,14 +891,33 @@ async function withdrawAnyway() {
 // HTML SAFETY
 // =====================================================
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  return String(
+    value
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
