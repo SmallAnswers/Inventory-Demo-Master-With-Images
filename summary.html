@@ -2,11 +2,7 @@
 <html>
 <head>
   <title>Plan Equipment / Orders</title>
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     * {
@@ -220,13 +216,14 @@
       line-height: 1.7;
     }
 
-    .withdraw-section {
+    .section-divider {
       margin-top: 25px;
       padding-top: 20px;
       border-top: 2px solid #eee;
     }
 
-    .partial-box {
+    .partial-box,
+    .addon-results {
       border: 1px solid #ddd;
       padding: 15px;
       border-radius: 10px;
@@ -247,6 +244,14 @@
       border-bottom: none;
     }
 
+    .addon-note {
+      background: #eef7ff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
     .fully-withdrawn {
       padding: 12px;
       background: #edf8ef;
@@ -255,8 +260,6 @@
       color: #1e8449;
       font-weight: bold;
     }
-
-    /* MODALS */
 
     .modal-bg {
       display: none;
@@ -289,23 +292,17 @@
       flex: 1;
     }
 
-    .duplicate-box {
-      padding: 12px;
+    .duplicate-box,
+    .plan-box {
+      padding: 10px;
       background: #fff9e6;
       border-radius: 8px;
-      margin: 15px 0;
+      margin-bottom: 10px;
     }
 
     .warning-box {
       padding: 10px;
       background: #fff4f3;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-
-    .plan-box {
-      padding: 10px;
-      background: #fff9e6;
       border-radius: 8px;
       margin-bottom: 10px;
     }
@@ -359,6 +356,7 @@
   <div class="card">
 
     <h2>Create New Order</h2>
+
 
     <label>Order Name</label>
 
@@ -414,7 +412,7 @@
 
 
   <!-- ================================================= -->
-  <!-- PLANNING RESULTS -->
+  <!-- NEW ORDER REQUIREMENTS -->
   <!-- ================================================= -->
 
   <div
@@ -470,7 +468,9 @@
 
     <div class="card">
 
-      <h2>Planned Requirements</h2>
+      <h2>
+        Planned Requirements
+      </h2>
 
 
       <div class="table-wrapper">
@@ -490,8 +490,9 @@
           </thead>
 
 
-          <tbody id="requirementsTable">
-          </tbody>
+          <tbody
+            id="requirementsTable"
+          ></tbody>
 
         </table>
 
@@ -526,10 +527,15 @@
 
   <div class="card">
 
-    <h2>Existing Orders</h2>
+    <h2>
+      Existing Orders
+    </h2>
 
 
-    <label>Search Order</label>
+    <label>
+      Search Order
+    </label>
+
 
     <input
       id="orderSearch"
@@ -538,8 +544,9 @@
     >
 
 
-    <select id="existingOrderSelect">
-    </select>
+    <select
+      id="existingOrderSelect"
+    ></select>
 
 
     <button
@@ -561,7 +568,9 @@
     class="card hidden"
   >
 
-    <h2 id="orderSummaryTitle">
+    <h2
+      id="orderSummaryTitle"
+    >
       Order Summary
     </h2>
 
@@ -579,20 +588,43 @@
         <thead>
 
           <tr>
-            <th>Item</th>
-            <th>Planned</th>
-            <th>Withdrawn</th>
-            <th>Returned</th>
-            <th>Expended</th>
-            <th>Remaining to Withdraw</th>
-            <th>Over Plan</th>
+
+            <th>
+              Item
+            </th>
+
+            <th>
+              Planned
+            </th>
+
+            <th>
+              Withdrawn
+            </th>
+
+            <th>
+              Returned
+            </th>
+
+            <th>
+              Expended
+            </th>
+
+            <th>
+              Remaining to Withdraw
+            </th>
+
+            <th>
+              Over Plan
+            </th>
+
           </tr>
 
         </thead>
 
 
-        <tbody id="orderSummaryTable">
-        </tbody>
+        <tbody
+          id="orderSummaryTable"
+        ></tbody>
 
       </table>
 
@@ -600,15 +632,136 @@
 
 
     <!-- ================================================= -->
-    <!-- ORDER WITHDRAWAL -->
+    <!-- ADD ACTIVITIES TO EXISTING ORDER -->
     <!-- ================================================= -->
 
-    <div class="withdraw-section">
+    <div class="section-divider">
 
-      <h3>Withdraw From This Order</h3>
+      <h3>
+        Add Activities to This Order
+      </h3>
 
 
-      <label>Person Withdrawing</label>
+      <div class="addon-note">
+
+        <strong>
+          The existing plan is fixed.
+        </strong>
+
+        <br>
+
+        Anything added here is appended to this Order.
+        Existing planned quantities are not edited,
+        reduced or replaced.
+
+      </div>
+
+
+      <div
+        id="addOnActivityContainer"
+      ></div>
+
+
+      <div class="button-row">
+
+        <button
+          class="add"
+          onclick="addAddOnActivityRow()"
+        >
+          + Add Activity
+        </button>
+
+
+        <button
+          class="calculate"
+          onclick="calculateAddOnRequirements()"
+        >
+          Preview Add-On
+        </button>
+
+      </div>
+
+
+      <div
+        id="addOnResults"
+        class="addon-results hidden"
+      >
+
+        <h4>
+          Additional Requirements
+        </h4>
+
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Item
+                </th>
+
+                <th>
+                  Current Stock
+                </th>
+
+                <th>
+                  Additional Planned Qty
+                </th>
+
+                <th>
+                  Stock After Add-On
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="addOnRequirementsTable"
+            ></tbody>
+
+          </table>
+
+        </div>
+
+
+        <div class="button-row">
+
+          <button
+            id="addToOrderButton"
+            class="save"
+            onclick="submitAddOnToOrder()"
+          >
+            Add to This Order
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- WITHDRAW FROM ORDER -->
+    <!-- ================================================= -->
+
+    <div class="section-divider">
+
+      <h3>
+        Withdraw From This Order
+      </h3>
+
+
+      <label>
+        Person Withdrawing
+      </label>
+
 
       <input
         id="withdrawalName"
@@ -649,27 +802,33 @@
       </div>
 
 
-      <!-- PARTIAL WITHDRAWAL -->
-
       <div
         id="partialSection"
         class="partial-box hidden"
       >
 
-        <h3>Partial Withdrawal</h3>
+        <h3>
+          Partial Withdrawal
+        </h3>
+
 
         <p>
-          The quantities below are pre-filled with the
-          remaining planned amounts.
+          The quantities below are pre-filled
+          with the remaining planned amounts.
         </p>
+
 
         <p>
-          Change a quantity to <strong>0</strong> if you
-          do not want to withdraw that item yet.
+          Change a quantity to
+          <strong>0</strong>
+          if you do not want to withdraw
+          that item yet.
         </p>
 
 
-        <div id="partialItems"></div>
+        <div
+          id="partialItems"
+        ></div>
 
 
         <div class="button-row">
@@ -697,7 +856,8 @@
 
     <p>
       Viewing this Order also refreshes the
-      <strong>Summary</strong> tab in Google Sheets.
+      <strong>Summary</strong>
+      tab in Google Sheets.
     </p>
 
   </div>
@@ -724,7 +884,10 @@
 
   <div class="modal">
 
-    <h3>Order Already Exists</h3>
+    <h3>
+      Order Already Exists
+    </h3>
+
 
     <p>
       An Order with this name already exists.
@@ -737,8 +900,10 @@
         Existing matching Order
       </label>
 
-      <select id="duplicateOrderSelect">
-      </select>
+
+      <select
+        id="duplicateOrderSelect"
+      ></select>
 
     </div>
 
@@ -796,9 +961,14 @@
     </h3>
 
 
-    <div id="stockWarnings"></div>
+    <div
+      id="stockWarnings"
+    ></div>
 
-    <div id="planWarnings"></div>
+
+    <div
+      id="planWarnings"
+    ></div>
 
 
     <p>
@@ -849,6 +1019,8 @@ let currentOrderSummary = null;
 
 let currentRequirements = [];
 
+let currentAddOnRequirements = [];
+
 let pendingWithdrawalMode = "";
 
 let duplicateOrderMatches = [];
@@ -869,7 +1041,10 @@ async function loadPage() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Could not load the Order system."
@@ -918,16 +1093,12 @@ async function loadActivities() {
 
 
 // =====================================================
-// ADD ACTIVITY ROW
+// GENERIC ACTIVITY ROW
 // =====================================================
 
-function addActivityRow() {
-
-  const container =
-    document.getElementById(
-      "activityContainer"
-    );
-
+function buildActivityRow(
+  type
+) {
 
   const row =
     document.createElement(
@@ -936,7 +1107,12 @@ function addActivityRow() {
 
 
   row.className =
-    "activity-row";
+
+    `activity-row ${
+      type === "addon"
+        ? "add-on-activity-row"
+        : "new-activity-row"
+    }`;
 
 
   const select =
@@ -946,33 +1122,42 @@ function addActivityRow() {
 
 
   select.className =
-    "activity-select";
+
+    type === "addon"
+
+      ? "add-on-activity-select"
+
+      : "activity-select";
 
 
   Object
-    .keys(activityDatabase)
+    .keys(
+      activityDatabase
+    )
     .sort()
-    .forEach(name => {
+    .forEach(
+      name => {
 
-      const option =
-        document.createElement(
-          "option"
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          name;
+
+
+        option.textContent =
+          name;
+
+
+        select.appendChild(
+          option
         );
 
-
-      option.value =
-        name;
-
-
-      option.textContent =
-        name;
-
-
-      select.appendChild(
-        option
-      );
-
-    });
+      }
+    );
 
 
   const sets =
@@ -984,17 +1169,26 @@ function addActivityRow() {
   sets.type =
     "number";
 
+
   sets.step =
     "any";
+
 
   sets.min =
     "0";
 
+
   sets.value =
     "1";
 
+
   sets.className =
-    "sets-input";
+
+    type === "addon"
+
+      ? "add-on-sets-input"
+
+      : "sets-input";
 
 
   const remove =
@@ -1006,26 +1200,47 @@ function addActivityRow() {
   remove.className =
     "remove";
 
+
   remove.textContent =
     "✕";
 
 
   remove.onclick =
-    function() {
+    () => {
 
       row.remove();
 
-      markPlanDirty();
+
+      if (
+        type === "addon"
+      ) {
+
+        markAddOnDirty();
+
+      } else {
+
+        markPlanDirty();
+
+      }
 
     };
 
 
+  const dirtyHandler =
+
+    type === "addon"
+
+      ? markAddOnDirty
+
+      : markPlanDirty;
+
+
   select.onchange =
-    markPlanDirty;
+    dirtyHandler;
 
 
   sets.oninput =
-    markPlanDirty;
+    dirtyHandler;
 
 
   row.appendChild(
@@ -1043,62 +1258,147 @@ function addActivityRow() {
   );
 
 
-  container.appendChild(
-    row
+  return row;
+
+}
+
+
+// =====================================================
+// NEW ORDER ACTIVITY ROW
+// =====================================================
+
+function addActivityRow() {
+
+  document
+    .getElementById(
+      "activityContainer"
+    )
+    .appendChild(
+      buildActivityRow(
+        "new"
+      )
+    );
+
+}
+
+
+// =====================================================
+// ADD-ON ACTIVITY ROW
+// =====================================================
+
+function addAddOnActivityRow() {
+
+  document
+    .getElementById(
+      "addOnActivityContainer"
+    )
+    .appendChild(
+      buildActivityRow(
+        "addon"
+      )
+    );
+
+
+  markAddOnDirty();
+
+}
+
+
+// =====================================================
+// GET NEW ORDER SELECTIONS
+// =====================================================
+
+function getSelections() {
+
+  return getSelectionsFromRows(
+
+    ".new-activity-row",
+
+    ".activity-select",
+
+    ".sets-input"
+
   );
 
 }
 
 
 // =====================================================
-// GET ACTIVITY SELECTIONS
+// GET ADD-ON SELECTIONS
 // =====================================================
 
-function getSelections() {
+function getAddOnSelections() {
 
-  const rows =
-    document.querySelectorAll(
-      ".activity-row"
+  return getSelectionsFromRows(
+
+    ".add-on-activity-row",
+
+    ".add-on-activity-select",
+
+    ".add-on-sets-input"
+
+  );
+
+}
+
+
+// =====================================================
+// GENERIC SELECTION READER
+// =====================================================
+
+function getSelectionsFromRows(
+  rowSelector,
+  activitySelector,
+  setsSelector
+) {
+
+  const selections = [];
+
+
+  document
+    .querySelectorAll(
+      rowSelector
+    )
+    .forEach(
+      row => {
+
+        const activity =
+          row
+            .querySelector(
+              activitySelector
+            )
+            .value;
+
+
+        const sets =
+          Number(
+            row
+              .querySelector(
+                setsSelector
+              )
+              .value
+          );
+
+
+        if (
+          activity &&
+          sets > 0
+        ) {
+
+          selections.push({
+
+            activity:
+              activity,
+
+            sets:
+              sets
+
+          });
+
+        }
+
+      }
     );
-
-
-  const selections =
-    [];
-
-
-  rows.forEach(row => {
-
-    const activity =
-      row
-        .querySelector(
-          ".activity-select"
-        )
-        .value;
-
-
-    const sets =
-      Number(
-        row
-          .querySelector(
-            ".sets-input"
-          )
-          .value
-      );
-
-
-    if (
-      activity &&
-      sets > 0
-    ) {
-
-      selections.push({
-        activity: activity,
-        sets: sets
-      });
-
-    }
-
-  });
 
 
   return selections;
@@ -1107,7 +1407,7 @@ function getSelections() {
 
 
 // =====================================================
-// CALCULATE REQUIREMENTS
+// CALCULATE NEW ORDER REQUIREMENTS
 // =====================================================
 
 async function calculateRequirements() {
@@ -1117,7 +1417,7 @@ async function calculateRequirements() {
 
 
   if (
-    selections.length === 0
+    !selections.length
   ) {
 
     alert(
@@ -1129,19 +1429,12 @@ async function calculateRequirements() {
   }
 
 
-  const url =
-    `${API_URL}?action=calculateRequirements` +
-    `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
-
-
   try {
 
-    const response =
-      await fetch(url);
-
-
     const data =
-      await response.json();
+      await fetchRequirements(
+        selections
+      );
 
 
     if (!data.success) {
@@ -1201,7 +1494,10 @@ async function calculateRequirements() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Calculation failed."
@@ -1213,10 +1509,46 @@ async function calculateRequirements() {
 
 
 // =====================================================
-// RENDER REQUIREMENTS
+// FETCH REQUIREMENTS
 // =====================================================
 
-function renderRequirements(list) {
+async function fetchRequirements(
+  selections
+) {
+
+  const url =
+
+    `${API_URL}?action=calculateRequirements`
+
+    +
+
+    `&selections=${
+      encodeURIComponent(
+        JSON.stringify(
+          selections
+        )
+      )
+    }`;
+
+
+  const response =
+    await fetch(
+      url
+    );
+
+
+  return response.json();
+
+}
+
+
+// =====================================================
+// RENDER NEW ORDER REQUIREMENTS
+// =====================================================
+
+function renderRequirements(
+  list
+) {
 
   const table =
     document.getElementById(
@@ -1228,74 +1560,87 @@ function renderRequirements(list) {
     "";
 
 
-  list.forEach(item => {
+  list.forEach(
+    item => {
 
-    const row =
-      document.createElement(
-        "tr"
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      if (
+        item.shortfall > 0
+      ) {
+
+        row.className =
+          "shortfall";
+
+      }
+
+
+      const missingText =
+
+        item.existsInInventory === false
+
+          ? " ⚠ Not in Inventory"
+
+          : "";
+
+
+      row.innerHTML = `
+
+        <td>
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <span class="bad">
+            ${missingText}
+          </span>
+
+        </td>
+
+        <td>
+          ${item.have}
+        </td>
+
+        <td>
+          ${item.need}
+        </td>
+
+        <td class="${
+          item.shortfall > 0
+            ? "bad"
+            : ""
+        }">
+          ${item.shortfall}
+        </td>
+
+        <td class="${
+          item.remaining < 0
+            ? "bad"
+            : ""
+        }">
+          ${item.remaining}
+        </td>
+
+      `;
+
+
+      table.appendChild(
+        row
       );
 
-
-    if (
-      item.shortfall > 0
-    ) {
-
-      row.className =
-        "shortfall";
-
     }
-
-
-    const missingText =
-      item.existsInInventory === false
-        ? " ⚠ Not in Inventory"
-        : "";
-
-
-    row.innerHTML = `
-
-      <td>
-
-        <strong>
-          ${escapeHtml(item.item)}
-        </strong>
-
-        <span class="bad">
-          ${missingText}
-        </span>
-
-      </td>
-
-      <td>
-        ${item.have}
-      </td>
-
-      <td>
-        ${item.need}
-      </td>
-
-      <td class="${item.shortfall > 0 ? "bad" : ""}">
-        ${item.shortfall}
-      </td>
-
-      <td class="${item.remaining < 0 ? "bad" : ""}">
-        ${item.remaining}
-      </td>
-
-    `;
-
-
-    table.appendChild(
-      row
-    );
-
-  });
+  );
 
 }
 
 
 // =====================================================
-// MARK PLAN DIRTY
+// MARK NEW PLAN CHANGED
 // =====================================================
 
 function markPlanDirty() {
@@ -1324,10 +1669,11 @@ function markPlanDirty() {
 
 // =====================================================
 // NORMALISE ORDER NAME
-// Case insensitive + ignores extra spaces.
 // =====================================================
 
-function normaliseOrderName(value) {
+function normaliseOrderName(
+  value
+) {
 
   return String(
     value || ""
@@ -1343,7 +1689,7 @@ function normaliseOrderName(value) {
 
 
 // =====================================================
-// SAVE ORDER
+// SAVE NEW ORDER
 // =====================================================
 
 async function saveOrder() {
@@ -1368,11 +1714,6 @@ async function saveOrder() {
   }
 
 
-  /*
-    This exact plan was already saved
-    during the current browser session.
-  */
-
   if (
     currentOrderId
   ) {
@@ -1393,29 +1734,21 @@ async function saveOrder() {
 
 
   duplicateOrderMatches =
-    orders.filter(order =>
+    orders.filter(
+      order =>
 
-      normaliseOrderName(
-        order.orderName
-      )
-      ===
-      targetName
+        normaliseOrderName(
+          order.orderName
+        )
 
+        ===
+
+        targetName
     );
 
 
-  /*
-    SAME ORDER NAME FOUND.
-
-    IMPORTANT:
-    We DO NOT use confirm() here.
-
-    We show our custom modal instead,
-    which has the THREE options.
-  */
-
   if (
-    duplicateOrderMatches.length > 0
+    duplicateOrderMatches.length
   ) {
 
     showDuplicateOrderModal(
@@ -1427,18 +1760,13 @@ async function saveOrder() {
   }
 
 
-  /*
-    No duplicate found.
-    Save normally.
-  */
-
   await saveOrderConfirmed();
 
 }
 
 
 // =====================================================
-// SHOW 3-OPTION DUPLICATE MODAL
+// DUPLICATE ORDER MODAL
 // =====================================================
 
 function showDuplicateOrderModal(
@@ -1455,27 +1783,29 @@ function showDuplicateOrderModal(
     "";
 
 
-  matches.forEach(order => {
+  matches.forEach(
+    order => {
 
-    const option =
-      document.createElement(
-        "option"
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        order.orderId;
+
+
+      option.textContent =
+        `${order.orderId} — ${order.orderName}`;
+
+
+      select.appendChild(
+        option
       );
 
-
-    option.value =
-      order.orderId;
-
-
-    option.textContent =
-      `${order.orderId} — ${order.orderName}`;
-
-
-    select.appendChild(
-      option
-    );
-
-  });
+    }
+  );
 
 
   document
@@ -1488,10 +1818,6 @@ function showDuplicateOrderModal(
 }
 
 
-// =====================================================
-// CLOSE DUPLICATE MODAL
-// =====================================================
-
 function closeDuplicateOrderModal() {
 
   document
@@ -1503,11 +1829,6 @@ function closeDuplicateOrderModal() {
 
 }
 
-
-// =====================================================
-// DUPLICATE OPTION 1:
-// OPEN EXISTING ORDER
-// =====================================================
 
 async function openExistingDuplicateOrder() {
 
@@ -1535,15 +1856,15 @@ async function openExistingDuplicateOrder() {
     );
 
 
-  const exists =
-    [...existingSelect.options]
-      .some(option =>
+  if (
+    [
+      ...existingSelect.options
+    ].some(
+      option =>
         option.value ===
         orderId
-      );
-
-
-  if (exists) {
+    )
+  ) {
 
     existingSelect.value =
       orderId;
@@ -1558,11 +1879,6 @@ async function openExistingDuplicateOrder() {
 }
 
 
-// =====================================================
-// DUPLICATE OPTION 2:
-// CREATE NEW ORDER ANYWAY
-// =====================================================
-
 async function createDuplicateOrderAnyway() {
 
   closeDuplicateOrderModal();
@@ -1574,7 +1890,7 @@ async function createDuplicateOrderAnyway() {
 
 
 // =====================================================
-// SAVE CONFIRMED ORDER
+// SAVE CONFIRMED NEW ORDER
 // =====================================================
 
 async function saveOrderConfirmed() {
@@ -1606,7 +1922,7 @@ async function saveOrderConfirmed() {
 
 
 // =====================================================
-// SAVE ORDER TO BACKEND
+// ACTUAL NEW ORDER SAVE
 // =====================================================
 
 async function saveOrderInternal() {
@@ -1674,7 +1990,7 @@ async function saveOrderInternal() {
 
 
   if (
-    selections.length === 0
+    !selections.length
   ) {
 
     alert(
@@ -1687,17 +2003,50 @@ async function saveOrderInternal() {
 
 
   const url =
-    `${API_URL}?action=saveOrder` +
-    `&orderName=${encodeURIComponent(orderName)}` +
-    `&createdBy=${encodeURIComponent(createdBy)}` +
-    `&notes=${encodeURIComponent(notes)}` +
-    `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
+
+    `${API_URL}?action=saveOrder`
+
+    +
+
+    `&orderName=${
+      encodeURIComponent(
+        orderName
+      )
+    }`
+
+    +
+
+    `&createdBy=${
+      encodeURIComponent(
+        createdBy
+      )
+    }`
+
+    +
+
+    `&notes=${
+      encodeURIComponent(
+        notes
+      )
+    }`
+
+    +
+
+    `&selections=${
+      encodeURIComponent(
+        JSON.stringify(
+          selections
+        )
+      )
+    }`;
 
 
   try {
 
     const response =
-      await fetch(url);
+      await fetch(
+        url
+      );
 
 
     const data =
@@ -1741,7 +2090,10 @@ async function saveOrderInternal() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Could not save Order."
@@ -1793,7 +2145,9 @@ async function loadOrders() {
 // RENDER ORDERS
 // =====================================================
 
-function renderOrders(list) {
+function renderOrders(
+  list
+) {
 
   const select =
     document.getElementById(
@@ -1809,35 +2163,39 @@ function renderOrders(list) {
     "";
 
 
-  list.forEach(order => {
+  list.forEach(
+    order => {
 
-    const option =
-      document.createElement(
-        "option"
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        order.orderId;
+
+
+      option.textContent =
+        `${order.orderId} — ${order.orderName}`;
+
+
+      select.appendChild(
+        option
       );
 
-
-    option.value =
-      order.orderId;
-
-
-    option.textContent =
-      `${order.orderId} — ${order.orderName}`;
-
-
-    select.appendChild(
-      option
-    );
-
-  });
+    }
+  );
 
 
   if (
-    [...select.options]
-      .some(option =>
+    [
+      ...select.options
+    ].some(
+      option =>
         option.value ===
         current
-      )
+    )
   ) {
 
     select.value =
@@ -1865,22 +2223,22 @@ function filterOrders() {
 
 
   const filtered =
-    orders.filter(order =>
+    orders.filter(
+      order =>
 
-      order.orderId
-        .toLowerCase()
-        .includes(
-          search
-        )
+        order.orderId
+          .toLowerCase()
+          .includes(
+            search
+          )
 
-      ||
+        ||
 
-      order.orderName
-        .toLowerCase()
-        .includes(
-          search
-        )
-
+        order.orderName
+          .toLowerCase()
+          .includes(
+            search
+          )
     );
 
 
@@ -1927,15 +2285,27 @@ async function viewSelectedOrderSummary() {
 // VIEW ORDER SUMMARY
 // =====================================================
 
-async function viewOrderSummary(orderId) {
+async function viewOrderSummary(
+  orderId
+) {
 
   try {
 
     const response =
       await fetch(
 
-        `${API_URL}?action=getOrderSummary` +
-        `&orderId=${encodeURIComponent(orderId)}` +
+        `${API_URL}?action=getOrderSummary`
+
+        +
+
+        `&orderId=${
+          encodeURIComponent(
+            orderId
+          )
+        }`
+
+        +
+
         `&write=1`
 
       );
@@ -1983,7 +2353,9 @@ async function viewOrderSummary(orderId) {
           Created By:
         </strong>
 
-        ${escapeHtml(data.order.createdBy)}
+        ${escapeHtml(
+          data.order.createdBy
+        )}
 
         <br>
 
@@ -1991,7 +2363,9 @@ async function viewOrderSummary(orderId) {
           Created At:
         </strong>
 
-        ${escapeHtml(data.order.createdAt)}
+        ${escapeHtml(
+          data.order.createdAt
+        )}
 
         <br>
 
@@ -1999,7 +2373,10 @@ async function viewOrderSummary(orderId) {
           Notes:
         </strong>
 
-        ${escapeHtml(data.order.notes || "—")}
+        ${escapeHtml(
+          data.order.notes ||
+          "—"
+        )}
 
       `;
 
@@ -2014,69 +2391,74 @@ async function viewOrderSummary(orderId) {
       "";
 
 
-    data.items.forEach(item => {
+    data.items.forEach(
+      item => {
 
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      if (
-        item.remainingToWithdraw ===
-        0
-      ) {
-
-        row.classList
-          .add(
-            "complete"
+        const row =
+          document.createElement(
+            "tr"
           );
 
+
+        if (
+          item.remainingToWithdraw === 0
+        ) {
+
+          row.classList
+            .add(
+              "complete"
+            );
+
+        }
+
+
+        row.innerHTML = `
+
+          <td>
+            <strong>
+              ${escapeHtml(item.item)}
+            </strong>
+          </td>
+
+          <td>
+            ${item.planned}
+          </td>
+
+          <td>
+            ${item.withdrawn}
+          </td>
+
+          <td>
+            ${item.returned}
+          </td>
+
+          <td>
+            ${item.expended}
+          </td>
+
+          <td>
+            <strong>
+              ${item.remainingToWithdraw}
+            </strong>
+          </td>
+
+          <td class="${
+            item.overPlan > 0
+              ? "bad"
+              : ""
+          }">
+            ${item.overPlan}
+          </td>
+
+        `;
+
+
+        table.appendChild(
+          row
+        );
+
       }
-
-
-      row.innerHTML = `
-
-        <td>
-          <strong>
-            ${escapeHtml(item.item)}
-          </strong>
-        </td>
-
-        <td>
-          ${item.planned}
-        </td>
-
-        <td>
-          ${item.withdrawn}
-        </td>
-
-        <td>
-          ${item.returned}
-        </td>
-
-        <td>
-          ${item.expended}
-        </td>
-
-        <td>
-          <strong>
-            ${item.remainingToWithdraw}
-          </strong>
-        </td>
-
-        <td class="${item.overPlan > 0 ? "bad" : ""}">
-          ${item.overPlan}
-        </td>
-
-      `;
-
-
-      table.appendChild(
-        row
-      );
-
-    });
+    );
 
 
     const withdrawalName =
@@ -2116,6 +2498,14 @@ async function viewOrderSummary(orderId) {
       );
 
 
+    /*
+      Every time an Order is opened,
+      start a fresh Add-On form.
+    */
+
+    resetAddOnForm();
+
+
     document
       .getElementById(
         "orderSummarySection"
@@ -2131,17 +2521,437 @@ async function viewOrderSummary(orderId) {
         "orderSummarySection"
       )
       .scrollIntoView({
-        behavior: "smooth"
+        behavior:
+          "smooth"
       });
 
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Could not load Order."
     );
+
+  }
+
+}
+
+
+// =====================================================
+// RESET ADD-ON FORM
+// =====================================================
+
+function resetAddOnForm() {
+
+  const container =
+    document.getElementById(
+      "addOnActivityContainer"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  currentAddOnRequirements =
+    [];
+
+
+  document
+    .getElementById(
+      "addOnResults"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  addAddOnActivityRow();
+
+}
+
+
+// =====================================================
+// MARK ADD-ON CHANGED
+// =====================================================
+
+function markAddOnDirty() {
+
+  currentAddOnRequirements =
+    [];
+
+
+  const results =
+    document.getElementById(
+      "addOnResults"
+    );
+
+
+  if (results) {
+
+    results
+      .classList
+      .add(
+        "hidden"
+      );
+
+  }
+
+}
+
+
+// =====================================================
+// PREVIEW ADD-ON
+// =====================================================
+
+async function calculateAddOnRequirements() {
+
+  if (
+    !currentViewedOrderId
+  ) {
+
+    alert(
+      "Open an Order first."
+    );
+
+    return;
+
+  }
+
+
+  const selections =
+    getAddOnSelections();
+
+
+  if (
+    !selections.length
+  ) {
+
+    alert(
+      "Select at least one activity to add."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const data =
+      await fetchRequirements(
+        selections
+      );
+
+
+    if (!data.success) {
+
+      alert(
+        data.error ||
+        "Could not calculate the add-on."
+      );
+
+      return;
+
+    }
+
+
+    currentAddOnRequirements =
+      data.requirements || [];
+
+
+    renderAddOnRequirements(
+      currentAddOnRequirements
+    );
+
+
+    document
+      .getElementById(
+        "addOnResults"
+      )
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "addToOrderButton"
+      )
+      .textContent =
+        `Add to ${currentViewedOrderId}`;
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Could not calculate the add-on."
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// RENDER ADD-ON PREVIEW
+// =====================================================
+
+function renderAddOnRequirements(
+  list
+) {
+
+  const table =
+    document.getElementById(
+      "addOnRequirementsTable"
+    );
+
+
+  table.innerHTML =
+    "";
+
+
+  list.forEach(
+    item => {
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      if (
+        item.shortfall > 0
+      ) {
+
+        row.className =
+          "shortfall";
+
+      }
+
+
+      const missingText =
+
+        item.existsInInventory === false
+
+          ? " ⚠ Not in Inventory"
+
+          : "";
+
+
+      row.innerHTML = `
+
+        <td>
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <span class="bad">
+            ${missingText}
+          </span>
+
+        </td>
+
+        <td>
+          ${item.have}
+        </td>
+
+        <td>
+          ${item.need}
+        </td>
+
+        <td class="${
+          item.remaining < 0
+            ? "bad"
+            : ""
+        }">
+          ${item.remaining}
+        </td>
+
+      `;
+
+
+      table.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+// =====================================================
+// ADD ACTIVITIES TO EXISTING ORDER
+// =====================================================
+
+async function submitAddOnToOrder() {
+
+  if (
+    !currentViewedOrderId
+  ) {
+
+    alert(
+      "Open an Order first."
+    );
+
+    return;
+
+  }
+
+
+  const selections =
+    getAddOnSelections();
+
+
+  if (
+    !selections.length
+  ) {
+
+    alert(
+      "Select at least one activity to add."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    User must preview first.
+
+    This makes it harder to accidentally
+    append the wrong recipe/quantity.
+  */
+
+  if (
+    !currentAddOnRequirements.length
+  ) {
+
+    alert(
+      "Preview the add-on first so you can check the additional quantities."
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "addToOrderButton"
+    );
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "Adding...";
+
+
+  const url =
+
+    `${API_URL}?action=addToOrder`
+
+    +
+
+    `&orderId=${
+      encodeURIComponent(
+        currentViewedOrderId
+      )
+    }`
+
+    +
+
+    `&selections=${
+      encodeURIComponent(
+        JSON.stringify(
+          selections
+        )
+      )
+    }`;
+
+
+  try {
+
+    const response =
+      await fetch(
+        url
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      alert(
+        data.error ||
+        "Could not add activities to this Order."
+      );
+
+      return;
+
+    }
+
+
+    alert(
+
+      `Activities added to ${currentViewedOrderId}. ` +
+
+      `The existing plan was kept and the new quantities were added on.`
+
+    );
+
+
+    /*
+      Reload the same Order.
+
+      Planned quantities will now show:
+      old plan + add-on plan.
+    */
+
+    await viewOrderSummary(
+      currentViewedOrderId
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Could not add activities to this Order."
+    );
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      `Add to ${currentViewedOrderId}`;
 
   }
 
@@ -2276,9 +3086,27 @@ async function withdrawAllRemaining(
 
 
   const url =
-    `${API_URL}?action=withdrawOrderRemaining` +
-    `&orderId=${encodeURIComponent(currentViewedOrderId)}` +
-    `&name=${encodeURIComponent(name)}` +
+
+    `${API_URL}?action=withdrawOrderRemaining`
+
+    +
+
+    `&orderId=${
+      encodeURIComponent(
+        currentViewedOrderId
+      )
+    }`
+
+    +
+
+    `&name=${
+      encodeURIComponent(
+        name
+      )
+    }`
+
+    +
+
     `&force=${force}`;
 
 
@@ -2368,71 +3196,72 @@ function renderPartialItems() {
 
   currentOrderSummary
     .items
-    .forEach(item => {
+    .forEach(
+      item => {
 
-      if (
-        item.remainingToWithdraw <=
-        0
-      ) {
+        if (
+          item.remainingToWithdraw <= 0
+        ) {
 
-        return;
+          return;
 
-      }
+        }
 
 
-      const row =
-        document.createElement(
-          "div"
+        const row =
+          document.createElement(
+            "div"
+          );
+
+
+        row.className =
+          "partial-row";
+
+
+        row.innerHTML = `
+
+          <div>
+
+            <strong>
+              ${escapeHtml(item.item)}
+            </strong>
+
+            <br>
+
+            Planned:
+            ${item.planned}
+
+            &nbsp;|&nbsp;
+
+            Withdrawn:
+            ${item.withdrawn}
+
+            &nbsp;|&nbsp;
+
+            Remaining:
+            ${item.remainingToWithdraw}
+
+          </div>
+
+
+          <input
+            type="number"
+            step="any"
+            min="0"
+            class="partialQty"
+            data-item="${escapeHtml(item.item)}"
+            value="${item.remainingToWithdraw}"
+          >
+
+        `;
+
+
+        container.appendChild(
+          row
         );
 
-
-      row.className =
-        "partial-row";
-
-
-      row.innerHTML = `
-
-        <div>
-
-          <strong>
-            ${escapeHtml(item.item)}
-          </strong>
-
-          <br>
-
-          Planned:
-          ${item.planned}
-
-          &nbsp;|&nbsp;
-
-          Withdrawn:
-          ${item.withdrawn}
-
-          &nbsp;|&nbsp;
-
-          Remaining:
-          ${item.remainingToWithdraw}
-
-        </div>
-
-
-        <input
-          type="number"
-          step="any"
-          min="0"
-          class="partialQty"
-          data-item="${escapeHtml(item.item)}"
-          value="${item.remainingToWithdraw}"
-        >
-
-      `;
-
-
-      container.appendChild(
-        row
-      );
-
-    });
+      }
+    );
 
 }
 
@@ -2443,41 +3272,45 @@ function renderPartialItems() {
 
 function getPartialItems() {
 
-  const inputs =
-    document.querySelectorAll(
+  const items = [];
+
+
+  document
+    .querySelectorAll(
       ".partialQty"
+    )
+    .forEach(
+      input => {
+
+        const qty =
+          Number(
+            input.value
+          );
+
+
+        const item =
+          input.dataset.item;
+
+
+        if (
+          item &&
+          qty > 0
+        ) {
+
+          items.push({
+
+            item:
+              item,
+
+            qty:
+              qty
+
+          });
+
+        }
+
+      }
     );
-
-
-  const items =
-    [];
-
-
-  inputs.forEach(input => {
-
-    const qty =
-      Number(
-        input.value
-      );
-
-
-    const item =
-      input.dataset.item;
-
-
-    if (
-      item &&
-      qty > 0
-    ) {
-
-      items.push({
-        item: item,
-        qty: qty
-      });
-
-    }
-
-  });
 
 
   return items;
@@ -2486,7 +3319,7 @@ function getPartialItems() {
 
 
 // =====================================================
-// SUBMIT PARTIAL WITHDRAWAL
+// PARTIAL WITHDRAW
 // =====================================================
 
 async function submitPartialWithdrawal(
@@ -2531,7 +3364,7 @@ async function submitPartialWithdrawal(
 
 
   if (
-    items.length === 0
+    !items.length
   ) {
 
     alert(
@@ -2548,11 +3381,38 @@ async function submitPartialWithdrawal(
 
 
   const url =
-    `${API_URL}?action=batchWithdraw` +
-    `&name=${encodeURIComponent(name)}` +
-    `&orderId=${encodeURIComponent(currentViewedOrderId)}` +
-    `&force=${force}` +
-    `&items=${encodeURIComponent(JSON.stringify(items))}`;
+
+    `${API_URL}?action=batchWithdraw`
+
+    +
+
+    `&name=${
+      encodeURIComponent(
+        name
+      )
+    }`
+
+    +
+
+    `&orderId=${
+      encodeURIComponent(
+        currentViewedOrderId
+      )
+    }`
+
+    +
+
+    `&force=${force}`
+
+    +
+
+    `&items=${
+      encodeURIComponent(
+        JSON.stringify(
+          items
+        )
+      )
+    }`;
 
 
   await processOrderWithdrawal(
@@ -2563,7 +3423,7 @@ async function submitPartialWithdrawal(
 
 
 // =====================================================
-// PROCESS ORDER WITHDRAWAL
+// PROCESS WITHDRAWAL
 // =====================================================
 
 async function processOrderWithdrawal(
@@ -2573,7 +3433,9 @@ async function processOrderWithdrawal(
   try {
 
     const response =
-      await fetch(url);
+      await fetch(
+        url
+      );
 
 
     const data =
@@ -2585,18 +3447,22 @@ async function processOrderWithdrawal(
     ) {
 
       showWarning(
-        data.shortages || [],
-        data.planExcesses || []
+
+        data.shortages ||
+        [],
+
+        data.planExcesses ||
+        []
+
       );
+
 
       return;
 
     }
 
 
-    if (
-      !data.success
-    ) {
+    if (!data.success) {
 
       alert(
         data.error ||
@@ -2608,9 +3474,21 @@ async function processOrderWithdrawal(
     }
 
 
-    alert(
-      "Withdrawal recorded successfully."
-    );
+    if (
+      data.nothingRemaining
+    ) {
+
+      alert(
+        data.message
+      );
+
+    } else {
+
+      alert(
+        "Withdrawal recorded successfully."
+      );
+
+    }
 
 
     closeWarning();
@@ -2626,7 +3504,10 @@ async function processOrderWithdrawal(
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Withdrawal failed."
@@ -2638,7 +3519,7 @@ async function processOrderWithdrawal(
 
 
 // =====================================================
-// WITHDRAWAL WARNING
+// WARNING MODAL
 // =====================================================
 
 function showWarning(
@@ -2667,126 +3548,130 @@ function showWarning(
 
 
   if (
-    shortages.length > 0
+    shortages.length
   ) {
 
     stockContainer.innerHTML =
       `<h4>Stock Shortfall</h4>`;
 
 
-    shortages.forEach(item => {
+    shortages.forEach(
+      item => {
 
-      const div =
-        document.createElement(
-          "div"
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "warning-box";
+
+
+        div.innerHTML = `
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Available:
+          ${item.available}
+
+          <br>
+
+          Requested:
+          ${item.requested}
+
+          <br>
+
+          <strong>
+            Shortfall:
+            ${item.shortfall}
+          </strong>
+
+          <br>
+
+          Stock after withdrawal:
+          ${item.newQty}
+
+        `;
+
+
+        stockContainer.appendChild(
+          div
         );
 
-
-      div.className =
-        "warning-box";
-
-
-      div.innerHTML = `
-
-        <strong>
-          ${escapeHtml(item.item)}
-        </strong>
-
-        <br>
-
-        Available:
-        ${item.available}
-
-        <br>
-
-        Requested:
-        ${item.requested}
-
-        <br>
-
-        <strong>
-          Shortfall:
-          ${item.shortfall}
-        </strong>
-
-        <br>
-
-        Stock after withdrawal:
-        ${item.newQty}
-
-      `;
-
-
-      stockContainer.appendChild(
-        div
-      );
-
-    });
+      }
+    );
 
   }
 
 
   if (
-    planExcesses.length > 0
+    planExcesses.length
   ) {
 
     planContainer.innerHTML =
       `<h4>Order Plan Exceeded</h4>`;
 
 
-    planExcesses.forEach(item => {
+    planExcesses.forEach(
+      item => {
 
-      const div =
-        document.createElement(
-          "div"
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "plan-box";
+
+
+        div.innerHTML = `
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Planned:
+          ${item.planned}
+
+          <br>
+
+          Already withdrawn:
+          ${item.withdrawnSoFar}
+
+          <br>
+
+          Remaining planned:
+          ${item.remainingPlanned}
+
+          <br>
+
+          Requested now:
+          ${item.requested}
+
+          <br>
+
+          <strong>
+            Exceeds plan by:
+            ${item.exceedsBy}
+          </strong>
+
+        `;
+
+
+        planContainer.appendChild(
+          div
         );
 
-
-      div.className =
-        "plan-box";
-
-
-      div.innerHTML = `
-
-        <strong>
-          ${escapeHtml(item.item)}
-        </strong>
-
-        <br>
-
-        Planned:
-        ${item.planned}
-
-        <br>
-
-        Already withdrawn:
-        ${item.withdrawnSoFar}
-
-        <br>
-
-        Remaining planned:
-        ${item.remainingPlanned}
-
-        <br>
-
-        Requested now:
-        ${item.requested}
-
-        <br>
-
-        <strong>
-          Exceeds plan by:
-          ${item.exceedsBy}
-        </strong>
-
-      `;
-
-
-      planContainer.appendChild(
-        div
-      );
-
-    });
+      }
+    );
 
   }
 
@@ -2800,10 +3685,6 @@ function showWarning(
 
 }
 
-
-// =====================================================
-// CLOSE WARNING
-// =====================================================
 
 function closeWarning() {
 
@@ -2831,11 +3712,9 @@ async function withdrawAnyway() {
     "all"
   ) {
 
-    await withdrawAllRemaining(
+    return withdrawAllRemaining(
       true
     );
-
-    return;
 
   }
 
@@ -2845,7 +3724,7 @@ async function withdrawAnyway() {
     "partial"
   ) {
 
-    await submitPartialWithdrawal(
+    return submitPartialWithdrawal(
       true
     );
 
@@ -2858,9 +3737,13 @@ async function withdrawAnyway() {
 // HTML SAFETY
 // =====================================================
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
-  return String(value)
+  return String(
+    value
+  )
     .replaceAll(
       "&",
       "&amp;"
