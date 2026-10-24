@@ -1,179 +1,622 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
+
 
 let globalInventory = [];
 let globalLogs = [];
 
-async function loadData() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
 
-    globalInventory = data.inventory || [];
-    globalLogs = data.logs || [];
+// =====================================================
+// LOAD DASHBOARD DATA
+// =====================================================
+
+async function loadData() {
+
+  try {
+
+    /*
+      Cache-buster ensures the dashboard asks
+      Apps Script for fresh inventory + logs.
+    */
+
+    const url =
+      `${API_URL}?cacheBust=${Date.now()}`;
+
+
+    const res =
+      await fetch(
+        url,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    const data =
+      await res.json();
+
+
+    if (
+      data.success === false
+    ) {
+
+      throw new Error(
+        data.error ||
+        "Could not load data."
+      );
+
+    }
+
+
+    globalInventory =
+      data.inventory || [];
+
+
+    globalLogs =
+      data.logs || [];
+
 
     populateCategories();
-    renderInventory(globalInventory);
-    renderLogs(globalLogs);
+
+
+    renderInventory(
+      globalInventory
+    );
+
+
+    renderLogs(
+      globalLogs
+    );
+
 
   } catch (err) {
-    console.error(err);
-    alert("Cannot load data");
+
+    console.error(
+      err
+    );
+
+
+    alert(
+      "Cannot load dashboard data."
+    );
+
   }
+
 }
 
 
-// ===== CATEGORY FILTER =====
+// =====================================================
+// CATEGORY FILTER
+// =====================================================
 
 function populateCategories() {
-  const select = document.getElementById("categoryFilter");
 
-  select.innerHTML = `<option value="">All Categories</option>`;
+  const select =
+    document.getElementById(
+      "categoryFilter"
+    );
 
-  const categories = [
-    ...new Set(globalInventory.map(i => i.category))
-  ];
 
-  categories.forEach(cat => {
-    const opt = document.createElement("option");
+  if (!select) {
 
-    opt.value = cat;
-    opt.textContent = cat;
+    return;
 
-    select.appendChild(opt);
-  });
+  }
+
+
+  const currentValue =
+    select.value;
+
+
+  select.innerHTML =
+    `<option value="">All Categories</option>`;
+
+
+  const categories =
+
+    [
+      ...new Set(
+
+        globalInventory
+          .map(
+            item =>
+              String(
+                item.category || ""
+              ).trim()
+          )
+          .filter(
+            Boolean
+          )
+
+      )
+    ]
+    .sort();
+
+
+  categories.forEach(
+    category => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        category;
+
+
+      option.textContent =
+        category;
+
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if (
+    categories.includes(
+      currentValue
+    )
+  ) {
+
+    select.value =
+      currentValue;
+
+  }
+
 }
 
+
+// =====================================================
+// FILTER INVENTORY
+// =====================================================
 
 function filterItems() {
-  const cat = document.getElementById("categoryFilter").value;
 
-  let list = globalInventory;
+  const select =
+    document.getElementById(
+      "categoryFilter"
+    );
 
-  if (cat) {
-    list = list.filter(i => i.category === cat);
+
+  if (!select) {
+
+    return;
+
   }
 
-  renderInventory(list);
+
+  const category =
+    select.value;
+
+
+  let list =
+    globalInventory;
+
+
+  if (category) {
+
+    list =
+      list.filter(
+        item =>
+          item.category ===
+          category
+      );
+
+  }
+
+
+  renderInventory(
+    list
+  );
+
 }
 
 
-// ===== GOOGLE DRIVE IMAGE CONVERSION =====
+// =====================================================
+// GOOGLE DRIVE IMAGE URL
+// =====================================================
 
-function getDriveImageUrl(url) {
-  if (!url) return "";
+function getDriveImageUrl(
+  url
+) {
 
-  let fileId = "";
+  if (!url) {
 
-  // Standard Drive link:
-  // https://drive.google.com/file/d/FILE_ID/view
-  const fileMatch = url.match(/\/file\/d\/([^/]+)/);
+    return "";
 
-  if (fileMatch) {
-    fileId = fileMatch[1];
   }
 
-  // Alternative Drive link:
-  // https://drive.google.com/open?id=FILE_ID
-  if (!fileId) {
-    const idMatch = url.match(/[?&]id=([^&]+)/);
 
-    if (idMatch) {
-      fileId = idMatch[1];
-    }
+  const text =
+    String(
+      url
+    ).trim();
+
+
+  /*
+    Base64 image from Google Sheets
+    Insert → Image in cell.
+  */
+
+  if (
+    text.startsWith(
+      "data:image/"
+    )
+  ) {
+
+    return text;
+
   }
 
-  if (!fileId) {
-    return url;
+
+  /*
+    Standard Google Drive sharing URL.
+  */
+
+  const fileMatch =
+    text.match(
+      /\/file\/d\/([^/]+)/
+    );
+
+
+  if (
+    fileMatch &&
+    fileMatch[1]
+  ) {
+
+    return (
+      "https://drive.google.com/thumbnail?id=" +
+      fileMatch[1] +
+      "&sz=w400"
+    );
+
   }
 
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+
+  /*
+    Google Drive ?id=FILE_ID format.
+  */
+
+  const idMatch =
+    text.match(
+      /[?&]id=([^&]+)/
+    );
+
+
+  if (
+    idMatch &&
+    idMatch[1]
+  ) {
+
+    return (
+      "https://drive.google.com/thumbnail?id=" +
+      idMatch[1] +
+      "&sz=w400"
+    );
+
+  }
+
+
+  /*
+    Any other direct image URL.
+  */
+
+  return text;
+
 }
 
 
-// ===== INVENTORY DISPLAY =====
+// =====================================================
+// RENDER INVENTORY
+// =====================================================
 
-function renderInventory(list) {
-  const el = document.getElementById("inventoryList");
+function renderInventory(
+  list
+) {
 
-  el.innerHTML = "";
+  const container =
+    document.getElementById(
+      "inventoryList"
+    );
 
-  list.forEach(i => {
-    const qty = isNaN(parseInt(i.qty))
-      ? 0
-      : parseInt(i.qty);
 
-    const div = document.createElement("div");
+  if (!container) {
 
-    div.className = "item";
+    return;
 
-    if (qty <= 3) {
-      div.classList.add("low");
+  }
+
+
+  container.innerHTML =
+    "";
+
+
+  if (
+    !list.length
+  ) {
+
+    container.textContent =
+      "No inventory items found.";
+
+    return;
+
+  }
+
+
+  list.forEach(
+    item => {
+
+      const qty =
+        Number(
+          item.qty
+        ) || 0;
+
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "item";
+
+
+      if (
+        qty <= 3
+      ) {
+
+        div.classList.add(
+          "low"
+        );
+
+      }
+
+
+      const imageUrl =
+        getDriveImageUrl(
+          item.image
+        );
+
+
+      /*
+        Only add an image if this dashboard's
+        CSS/layout supports it.
+      */
+
+      if (imageUrl) {
+
+        const img =
+          document.createElement(
+            "img"
+          );
+
+
+        img.src =
+          imageUrl;
+
+
+        img.alt =
+          item.name || "Inventory item";
+
+
+        img.style.width =
+          "55px";
+
+
+        img.style.height =
+          "55px";
+
+
+        img.style.objectFit =
+          "cover";
+
+
+        img.style.borderRadius =
+          "8px";
+
+
+        img.style.marginRight =
+          "10px";
+
+
+        img.style.verticalAlign =
+          "middle";
+
+
+        div.appendChild(
+          img
+        );
+
+      }
+
+
+      const text =
+        document.createElement(
+          "span"
+        );
+
+
+      text.textContent =
+
+        `${item.name}` +
+
+        (
+          item.category
+            ? ` (${item.category})`
+            : ""
+        )
+
+        +
+
+        ` — ${qty}`;
+
+
+      div.appendChild(
+        text
+      );
+
+
+      container.appendChild(
+        div
+      );
+
     }
+  );
 
-    // Image exists
-    if (i.image) {
-      const imageUrl = getDriveImageUrl(i.image);
-
-      div.innerHTML = `
-        <div style="
-          display:flex;
-          align-items:center;
-          gap:12px;
-        ">
-
-          <img
-            src="${imageUrl}"
-            alt="${i.name}"
-            style="
-              width:70px;
-              height:70px;
-              object-fit:cover;
-              border-radius:8px;
-              border:1px solid #ddd;
-              flex-shrink:0;
-            "
-          >
-
-          <div>
-            <strong>${i.name}</strong><br>
-            <span>${i.category}</span><br>
-            <span>Qty: ${qty}</span>
-          </div>
-
-        </div>
-      `;
-    }
-
-    // No image
-    else {
-      div.innerHTML =
-        `${i.name} (${i.category}) — ${qty}`;
-    }
-
-    el.appendChild(div);
-  });
 }
 
 
-// ===== RECENT ACTIVITY =====
+// =====================================================
+// RENDER RECENT ACTIVITY
+// =====================================================
 
-function renderLogs(logs) {
-  const el = document.getElementById("logList");
+function renderLogs(
+  logs
+) {
 
-  el.innerHTML = "";
+  const list =
+    document.getElementById(
+      "logList"
+    );
+
+
+  if (!list) {
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    "";
+
+
+  if (
+    !logs.length
+  ) {
+
+    const li =
+      document.createElement(
+        "li"
+      );
+
+
+    li.textContent =
+      "No recent activity.";
+
+
+    list.appendChild(
+      li
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    IMPORTANT:
+
+    Code.gs already sends Logs NEWEST FIRST.
+
+    Therefore we take the FIRST 10.
+
+    Do NOT use:
+    logs.slice(-10).reverse()
+  */
 
   logs
-    .slice(-10)
-    .reverse()
-    .forEach(l => {
-      const li = document.createElement("li");
+    .slice(
+      0,
+      10
+    )
+    .forEach(
+      log => {
 
-      li.textContent =
-        `${l.name} ${l.action} ${l.qty} ${l.item}`;
+        const li =
+          document.createElement(
+            "li"
+          );
 
-      el.appendChild(li);
-    });
+
+        const orderText =
+          log.orderId
+            ? ` [${log.orderId}]`
+            : "";
+
+
+        const activityText =
+          log.activity
+            ? ` — ${log.activity}`
+            : "";
+
+
+        const timeText =
+          log.time
+            ? `${log.time} — `
+            : "";
+
+
+        li.textContent =
+
+          `${timeText}` +
+
+          `${log.name} ` +
+
+          `${log.action} ` +
+
+          `${log.qty} ` +
+
+          `${log.item}` +
+
+          `${orderText}` +
+
+          `${activityText}`;
+
+
+        list.appendChild(
+          li
+        );
+
+      }
+    );
+
 }
 
 
-window.onload = loadData;
+// =====================================================
+// INITIAL LOAD
+// =====================================================
+
+window.addEventListener(
+  "load",
+  loadData
+);
+
+
+// =====================================================
+// REFRESH IF BROWSER RESTORES OLD DASHBOARD FROM CACHE
+// =====================================================
+
+window.addEventListener(
+  "pageshow",
+  event => {
+
+    if (
+      event.persisted
+    ) {
+
+      loadData();
+
+    }
+
+  }
+);
