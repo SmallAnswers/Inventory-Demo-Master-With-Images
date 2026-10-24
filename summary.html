@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <title>Requirements Summary</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #eef2f3;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .activity-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 45px;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .add {
+      background: #f1c40f;
+      color: #222;
+    }
+
+    .calculate {
+      background: #8e44ad;
+      color: white;
+    }
+
+    .save {
+      background: #27ae60;
+      color: white;
+    }
+
+    .back {
+      background: #7f8c8d;
+      color: white;
+    }
+
+    .remove {
+      background: #e74c3c;
+      color: white;
+      padding: 10px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-box {
+      background: #f7f7f7;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .summary-number {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .warning-number {
+      color: #e74c3c;
+    }
+
+    .good-number {
+      color: #27ae60;
+    }
+
+    .filters {
+      margin-bottom: 15px;
+    }
+
+    .filter-button {
+      background: #ddd;
+      margin-right: 5px;
+    }
+
+    .filter-button.active {
+      background: #34495e;
+      color: white;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #f4f4f4;
+    }
+
+    .shortfall-row {
+      background: #fff1f0;
+    }
+
+    .top-up {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .enough {
+      color: #27ae60;
+      font-weight: bold;
+    }
+
+    .negative {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 650px) {
+
+      .activity-row {
+        grid-template-columns: 1fr 85px 40px;
+      }
+
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        font-size: 13px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+  <h1>Requirements Summary</h1>
+
+
+  <!-- ============================= -->
+  <!-- ACTIVITY SELECTION -->
+  <!-- ============================= -->
+
+  <div class="card">
+
+    <h3>Programme Activities</h3>
+
+    <p>
+      Select the activities required and enter the
+      number of sets needed.
+    </p>
+
+    <div id="activityContainer"></div>
+
+
+    <div class="button-row">
+
+      <button
+        class="add"
+        onclick="addActivityRow()">
+        + Add Activity
+      </button>
+
+      <button
+        class="calculate"
+        onclick="calculateRequirements()">
+        Calculate Requirements
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ============================= -->
+  <!-- RESULTS -->
+  <!-- ============================= -->
+
+  <div
+    id="resultsSection"
+    class="hidden"
+  >
+
+    <div class="summary-cards">
+
+      <div class="summary-box">
+
+        <div
+          id="totalItems"
+          class="summary-number">
+          0
+        </div>
+
+        Equipment Types
+
+      </div>
+
+
+      <div class="summary-box">
+
+        <div
+          id="sufficientItems"
+          class="summary-number good-number">
+          0
+        </div>
+
+        Sufficient
+
+      </div>
+
+
+      <div class="summary-box">
+
+        <div
+          id="shortfallItems"
+          class="summary-number warning-number">
+          0
+        </div>
+
+        Need Top Up
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="filters">
+
+        <button
+          id="allButton"
+          class="filter-button active"
+          onclick="showAll()">
+          All Items
+        </button>
+
+        <button
+          id="shortfallButton"
+          class="filter-button"
+          onclick="showShortfall()">
+          Shortfall Only
+        </button>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Item</th>
+              <th>Have</th>
+              <th>Need</th>
+              <th>Shortfall</th>
+              <th>Remaining</th>
+              <th>Status</th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="requirementsTable">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div class="button-row">
+
+        <button
+          class="save"
+          onclick="saveSummary()">
+          Save to Google Sheets
+        </button>
+
+      </div>
+
+
+      <div id="message"></div>
+
+    </div>
+
+  </div>
+
+
+  <div class="button-row">
+
+    <button
+      class="back"
+      onclick="location.href='index.html'">
+      ← Back to Dashboard
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+// =====================================================
+// API
+// =====================================================
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
+
+
+let activityDatabase = {};
+
+let currentRequirements = [];
+
+
+// =====================================================
+// LOAD ACTIVITIES
+// =====================================================
+
+async function loadActivities() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_URL}?action=getActivities`
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      alert(
+        data.error ||
+        "Could not load activities."
+      );
+
+      return;
+    }
+
+
+    activityDatabase =
+      data.activities || {};
+
+
+    addActivityRow();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Could not connect to the inventory system."
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// ADD ACTIVITY ROW
+// =====================================================
+
+function addActivityRow() {
+
+  const container =
+    document.getElementById(
+      "activityContainer"
+    );
+
+
+  const row =
+    document.createElement("div");
+
+
+  row.className =
+    "activity-row";
+
+
+  const select =
+    document.createElement("select");
+
+
+  select.className =
+    "activity-select";
+
+
+  const activityNames =
+    Object.keys(
+      activityDatabase
+    ).sort();
+
+
+  activityNames.forEach(name => {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+
+    option.value =
+      name;
+
+
+    option.textContent =
+      name;
+
+
+    select.appendChild(
+      option
+    );
+
+  });
+
+
+  const sets =
+    document.createElement("input");
+
+
+  sets.type =
+    "number";
+
+
+  sets.className =
+    "sets-input";
+
+
+  sets.min =
+    "1";
+
+
+  sets.value =
+    "1";
+
+
+  const remove =
+    document.createElement(
+      "button"
+    );
+
+
+  remove.className =
+    "remove";
+
+
+  remove.textContent =
+    "✕";
+
+
+  remove.onclick =
+    function() {
+
+      row.remove();
+
+    };
+
+
+  row.appendChild(
+    select
+  );
+
+
+  row.appendChild(
+    sets
+  );
+
+
+  row.appendChild(
+    remove
+  );
+
+
+  container.appendChild(
+    row
+  );
+
+}
+
+
+// =====================================================
+// GET SELECTED ACTIVITIES
+// =====================================================
+
+function getSelections() {
+
+  const rows =
+    document.querySelectorAll(
+      ".activity-row"
+    );
+
+
+  const selections = [];
+
+
+  rows.forEach(row => {
+
+    const activity =
+      row.querySelector(
+        ".activity-select"
+      ).value;
+
+
+    const sets =
+      Number(
+        row.querySelector(
+          ".sets-input"
+        ).value
+      );
+
+
+    if (
+      activity &&
+      sets > 0
+    ) {
+
+      selections.push({
+
+        activity: activity,
+        sets: sets
+
+      });
+
+    }
+
+  });
+
+
+  return selections;
+
+}
+
+
+// =====================================================
+// CREATE API ACTIVITY STRING
+// =====================================================
+
+function createActivityString(
+  selections
+) {
+
+  return selections
+    .map(selection =>
+
+      `${selection.activity}:${selection.sets}`
+
+    )
+    .join(",");
+
+}
+
+
+// =====================================================
+// CALCULATE REQUIREMENTS
+// =====================================================
+
+async function calculateRequirements() {
+
+  const selections =
+    getSelections();
+
+
+  if (
+    selections.length === 0
+  ) {
+
+    alert(
+      "Please select at least one activity."
+    );
+
+    return;
+
+  }
+
+
+  const activityString =
+    createActivityString(
+      selections
+    );
+
+
+  try {
+
+    const response =
+      await fetch(
+
+        `${API_URL}?action=calculateRequirements&activities=${encodeURIComponent(activityString)}`
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      alert(
+        data.error ||
+        "Could not calculate requirements."
+      );
+
+      return;
+
+    }
+
+
+    currentRequirements =
+      data.requirements || [];
+
+
+    document
+      .getElementById(
+        "totalItems"
+      )
+      .textContent =
+        data.totalItems || 0;
+
+
+    document
+      .getElementById(
+        "sufficientItems"
+      )
+      .textContent =
+        data.sufficientItems || 0;
+
+
+    document
+      .getElementById(
+        "shortfallItems"
+      )
+      .textContent =
+        data.shortfallItems || 0;
+
+
+    renderRequirements(
+      currentRequirements
+    );
+
+
+    document
+      .getElementById(
+        "resultsSection"
+      )
+      .classList
+      .remove("hidden");
+
+
+    showAll();
+
+
+    document
+      .getElementById(
+        "message"
+      )
+      .textContent = "";
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Could not calculate requirements."
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// RENDER REQUIREMENTS
+// =====================================================
+
+function renderRequirements(
+  requirements
+) {
+
+  const table =
+    document.getElementById(
+      "requirementsTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  requirements.forEach(item => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.dataset.shortfall =
+      item.shortfall > 0
+        ? "yes"
+        : "no";
+
+
+    if (
+      item.shortfall > 0
+    ) {
+
+      row.classList.add(
+        "shortfall-row"
+      );
+
+    }
+
+
+    const status =
+      item.shortfall > 0
+        ? `<span class="top-up">TOP UP</span>`
+        : `<span class="enough">Enough</span>`;
+
+
+    const remainingClass =
+      item.remaining < 0
+        ? "negative"
+        : "";
+
+
+    row.innerHTML = `
+
+      <td>
+        <strong>${item.item}</strong>
+      </td>
+
+      <td>
+        ${item.have}
+      </td>
+
+      <td>
+        ${item.need}
+      </td>
+
+      <td class="${item.shortfall > 0 ? "top-up" : ""}">
+        ${item.shortfall}
+      </td>
+
+      <td class="${remainingClass}">
+        ${item.remaining}
+      </td>
+
+      <td>
+        ${status}
+      </td>
+
+    `;
+
+
+    table.appendChild(
+      row
+    );
+
+  });
+
+}
+
+
+// =====================================================
+// SHOW ALL ITEMS
+// =====================================================
+
+function showAll() {
+
+  const rows =
+    document.querySelectorAll(
+      "#requirementsTable tr"
+    );
+
+
+  rows.forEach(row => {
+
+    row.style.display = "";
+
+  });
+
+
+  document
+    .getElementById(
+      "allButton"
+    )
+    .classList
+    .add("active");
+
+
+  document
+    .getElementById(
+      "shortfallButton"
+    )
+    .classList
+    .remove("active");
+
+}
+
+
+// =====================================================
+// SHOW SHORTFALL ONLY
+// =====================================================
+
+function showShortfall() {
+
+  const rows =
+    document.querySelectorAll(
+      "#requirementsTable tr"
+    );
+
+
+  rows.forEach(row => {
+
+    if (
+      row.dataset.shortfall ===
+      "yes"
+    ) {
+
+      row.style.display = "";
+
+    } else {
+
+      row.style.display =
+        "none";
+
+    }
+
+  });
+
+
+  document
+    .getElementById(
+      "shortfallButton"
+    )
+    .classList
+    .add("active");
+
+
+  document
+    .getElementById(
+      "allButton"
+    )
+    .classList
+    .remove("active");
+
+}
+
+
+// =====================================================
+// SAVE SUMMARY TO GOOGLE SHEETS
+// =====================================================
+
+async function saveSummary() {
+
+  const selections =
+    getSelections();
+
+
+  if (
+    selections.length === 0
+  ) {
+
+    alert(
+      "Please select at least one activity."
+    );
+
+    return;
+
+  }
+
+
+  const activityString =
+    createActivityString(
+      selections
+    );
+
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.textContent =
+    "Saving summary...";
+
+
+  try {
+
+    const response =
+      await fetch(
+
+        `${API_URL}?action=saveSummary&activities=${encodeURIComponent(activityString)}`
+
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      message.textContent =
+        data.error ||
+        "Could not save summary.";
+
+      return;
+
+    }
+
+
+    message.textContent =
+      "✓ Summary saved to Google Sheets.";
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    message.textContent =
+      "Could not save summary.";
+
+  }
+
+}
+
+
+// =====================================================
+// START
+// =====================================================
+
+window.onload =
+  loadActivities;
+
+</script>
+
+</body>
+
+</html>
