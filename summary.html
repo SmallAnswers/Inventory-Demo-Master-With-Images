@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
-  <title>Requirements Summary</title>
+  <title>Plan Equipment</title>
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+    content="width=device-width, initial-scale=1">
 
   <style>
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -31,7 +27,6 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 25px;
     }
 
     .card {
@@ -42,21 +37,29 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .activity-row {
-      display: grid;
-      grid-template-columns: 1fr 120px 45px;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: center;
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #666;
     }
 
+    input,
     select,
-    input {
+    textarea {
       width: 100%;
-      padding: 11px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .activity-row {
+      display: grid;
+      grid-template-columns:
+        1fr 110px 50px;
+      gap: 10px;
+      margin-top: 10px;
     }
 
     button {
@@ -65,11 +68,11 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 10px;
     }
 
     .add {
       background: #f1c40f;
-      color: #222;
     }
 
     .calculate {
@@ -78,7 +81,17 @@
     }
 
     .save {
+      background: #2980b9;
+      color: white;
+    }
+
+    .withdraw {
       background: #27ae60;
+      color: white;
+    }
+
+    .view {
+      background: #34495e;
       color: white;
     }
 
@@ -90,56 +103,42 @@
     .remove {
       background: #e74c3c;
       color: white;
-      padding: 10px;
+      padding: 8px;
+      margin: 0;
     }
 
     .button-row {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
-      margin-top: 15px;
+      gap: 10px;
     }
 
     .summary-cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns:
+        repeat(3, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
 
     .summary-box {
-      background: #f7f7f7;
-      padding: 15px;
+      background: #f6f6f6;
       border-radius: 10px;
+      padding: 15px;
       text-align: center;
     }
 
     .summary-number {
-      font-size: 26px;
+      font-size: 25px;
       font-weight: bold;
-      margin-bottom: 5px;
     }
 
-    .warning-number {
-      color: #e74c3c;
-    }
-
-    .good-number {
+    .good {
       color: #27ae60;
     }
 
-    .filters {
-      margin-bottom: 15px;
-    }
-
-    .filter-button {
-      background: #ddd;
-      margin-right: 5px;
-    }
-
-    .filter-button.active {
-      background: #34495e;
-      color: white;
+    .bad {
+      color: #e74c3c;
     }
 
     .table-wrapper {
@@ -153,57 +152,69 @@
 
     th,
     td {
-      padding: 12px;
+      padding: 11px;
+      border-bottom:
+        1px solid #ddd;
       text-align: left;
-      border-bottom: 1px solid #ddd;
     }
 
     th {
       background: #f4f4f4;
     }
 
-    .shortfall-row {
+    .shortfall {
       background: #fff1f0;
-    }
-
-    .top-up {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-
-    .enough {
-      color: #27ae60;
-      font-weight: bold;
-    }
-
-    .negative {
-      color: #e74c3c;
-      font-weight: bold;
     }
 
     .hidden {
       display: none;
     }
 
-    #message {
+    .saved-order {
       margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #edf7ed;
       font-weight: bold;
     }
 
-    @media (max-width: 650px) {
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background:
+        rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      background: white;
+      width: 100%;
+      max-width: 450px;
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .warning {
+      color: #c0392b;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    @media(max-width:650px) {
 
       .activity-row {
-        grid-template-columns: 1fr 85px 40px;
+        grid-template-columns:
+          1fr 80px 45px;
       }
 
       .summary-cards {
         grid-template-columns: 1fr;
-      }
-
-      th,
-      td {
-        padding: 8px;
-        font-size: 13px;
       }
 
     }
@@ -212,176 +223,286 @@
 
 </head>
 
-
 <body>
 
 <div class="container">
 
-  <h1>Requirements Summary</h1>
+<h1>Equipment Planning</h1>
 
 
-  <!-- ============================= -->
-  <!-- ACTIVITY SELECTION -->
-  <!-- ============================= -->
+<!-- ================================================= -->
+<!-- CREATE ORDER -->
+<!-- ================================================= -->
 
-  <div class="card">
+<div class="card">
 
-    <h3>Programme Activities</h3>
+  <h2>Create New Order</h2>
 
-    <p>
-      Select the activities required and enter the
-      number of sets needed.
-    </p>
+  <label>Order Name</label>
 
-    <div id="activityContainer"></div>
-
-
-    <div class="button-row">
-
-      <button
-        class="add"
-        onclick="addActivityRow()">
-        + Add Activity
-      </button>
-
-      <button
-        class="calculate"
-        onclick="calculateRequirements()">
-        Calculate Requirements
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- ============================= -->
-  <!-- RESULTS -->
-  <!-- ============================= -->
-
-  <div
-    id="resultsSection"
-    class="hidden"
+  <input
+    id="orderName"
+    placeholder="e.g. Naval Base Sec 1 Camp"
+    oninput="markPlanDirty()"
   >
 
-    <div class="summary-cards">
 
-      <div class="summary-box">
+  <label>Prepared By</label>
 
-        <div
-          id="totalItems"
-          class="summary-number">
-          0
-        </div>
-
-        Equipment Types
-
-      </div>
+  <input
+    id="createdBy"
+    oninput="markPlanDirty()"
+  >
 
 
-      <div class="summary-box">
+  <label>Notes (Optional)</label>
 
-        <div
-          id="sufficientItems"
-          class="summary-number good-number">
-          0
-        </div>
-
-        Sufficient
-
-      </div>
+  <textarea
+    id="notes"
+    rows="2">
+  </textarea>
 
 
-      <div class="summary-box">
+  <h3>Activities</h3>
 
-        <div
-          id="shortfallItems"
-          class="summary-number warning-number">
-          0
-        </div>
-
-        Need Top Up
-
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      <div class="filters">
-
-        <button
-          id="allButton"
-          class="filter-button active"
-          onclick="showAll()">
-          All Items
-        </button>
-
-        <button
-          id="shortfallButton"
-          class="filter-button"
-          onclick="showShortfall()">
-          Shortfall Only
-        </button>
-
-      </div>
-
-
-      <div class="table-wrapper">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>Item</th>
-              <th>Have</th>
-              <th>Need</th>
-              <th>Shortfall</th>
-              <th>Remaining</th>
-              <th>Status</th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody id="requirementsTable">
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-      <div class="button-row">
-
-        <button
-          class="save"
-          onclick="saveSummary()">
-          Save to Google Sheets
-        </button>
-
-      </div>
-
-
-      <div id="message"></div>
-
-    </div>
-
-  </div>
+  <div id="activityContainer"></div>
 
 
   <div class="button-row">
 
     <button
-      class="back"
-      onclick="location.href='index.html'">
-      ← Back to Dashboard
+      class="add"
+      onclick="addActivityRow()">
+      + Add Activity
     </button>
+
+    <button
+      class="calculate"
+      onclick="calculateRequirements()">
+      Calculate Requirements
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- CALCULATION -->
+<!-- ================================================= -->
+
+<div
+  id="resultsSection"
+  class="hidden">
+
+  <div class="summary-cards">
+
+    <div class="summary-box">
+      <div
+        id="totalItems"
+        class="summary-number">
+        0
+      </div>
+      Equipment Types
+    </div>
+
+    <div class="summary-box">
+      <div
+        id="sufficientItems"
+        class="summary-number good">
+        0
+      </div>
+      Sufficient
+    </div>
+
+    <div class="summary-box">
+      <div
+        id="shortfallItems"
+        class="summary-number bad">
+        0
+      </div>
+      Need Top Up
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Have</th>
+            <th>Need</th>
+            <th>Shortfall</th>
+            <th>Remaining</th>
+          </tr>
+        </thead>
+
+        <tbody id="requirementsTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <div
+      id="savedOrderInfo"
+      class="hidden saved-order">
+    </div>
+
+
+    <div class="button-row">
+
+      <button
+        class="save"
+        onclick="saveOrder()">
+        Save Order
+      </button>
+
+      <button
+        class="withdraw"
+        onclick="withdrawCurrentOrder(false)">
+        Withdraw Full Order
+      </button>
+
+      <button
+        id="viewCurrentButton"
+        class="view hidden"
+        onclick="viewCurrentOrderSummary()">
+        View Saved Order Summary
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- EXISTING ORDERS -->
+<!-- ================================================= -->
+
+<div class="card">
+
+  <h2>Existing Orders</h2>
+
+  <label>Search Order</label>
+
+  <input
+    id="orderSearch"
+    placeholder="Search by Order ID or name..."
+    oninput="filterOrders()"
+  >
+
+
+  <select id="existingOrderSelect">
+  </select>
+
+
+  <button
+    class="view"
+    onclick="viewSelectedOrderSummary()">
+    View Order Summary
+  </button>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- ORDER SUMMARY -->
+<!-- ================================================= -->
+
+<div
+  id="orderSummarySection"
+  class="card hidden">
+
+  <h2 id="orderSummaryTitle">
+    Order Summary
+  </h2>
+
+  <div id="orderMeta"></div>
+
+  <div class="table-wrapper">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Planned</th>
+          <th>Withdrawn</th>
+          <th>Returned</th>
+          <th>Expended</th>
+        </tr>
+      </thead>
+
+      <tbody id="orderSummaryTable">
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <p>
+    This summary has also been written
+    to the Google Sheets
+    <strong>Summary</strong> tab.
+  </p>
+
+</div>
+
+
+<button
+  class="back"
+  onclick="location.href='index.html'">
+  ← Back to Dashboard
+</button>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- WARNING MODAL -->
+<!-- ================================================= -->
+
+<div
+  id="warningModal"
+  class="modal-bg">
+
+  <div class="modal">
+
+    <h3 class="warning">
+      ⚠️ Insufficient Stock
+    </h3>
+
+    <div id="warningContent"></div>
+
+    <p>
+      Continuing will allow the affected
+      inventory quantities to become negative.
+    </p>
+
+    <div class="modal-buttons">
+
+      <button
+        onclick="closeWarning()">
+        Cancel
+      </button>
+
+      <button
+        class="withdraw"
+        onclick="withdrawAnyway()">
+        Withdraw Anyway
+      </button>
+
+    </div>
 
   </div>
 
@@ -390,71 +511,64 @@
 
 <script>
 
-// =====================================================
-// API
-// =====================================================
-
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
-
+"https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
 
 let activityDatabase = {};
-
+let orders = [];
+let currentOrderId = "";
 let currentRequirements = [];
 
 
 // =====================================================
-// LOAD ACTIVITIES
+// LOAD
 // =====================================================
 
-async function loadActivities() {
+async function loadPage() {
 
-  try {
-
-    const response =
-      await fetch(
-        `${API_URL}?action=getActivities`
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if (!data.success) {
-
-      alert(
-        data.error ||
-        "Could not load activities."
-      );
-
-      return;
-    }
-
-
-    activityDatabase =
-      data.activities || {};
-
-
-    addActivityRow();
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Could not connect to the inventory system."
-    );
-
-  }
+  await Promise.all([
+    loadActivities(),
+    loadOrders()
+  ]);
 
 }
 
 
 // =====================================================
-// ADD ACTIVITY ROW
+// ACTIVITIES
 // =====================================================
+
+async function loadActivities() {
+
+  const response =
+    await fetch(
+      `${API_URL}?action=getActivities`
+    );
+
+
+  const data =
+    await response.json();
+
+
+  if (!data.success) {
+
+    alert(
+      data.error ||
+      "Could not load activities."
+    );
+
+    return;
+  }
+
+
+  activityDatabase =
+    data.activities || {};
+
+
+  addActivityRow();
+
+}
+
 
 function addActivityRow() {
 
@@ -480,64 +594,41 @@ function addActivityRow() {
     "activity-select";
 
 
-  const activityNames =
-    Object.keys(
-      activityDatabase
-    ).sort();
+  Object.keys(activityDatabase)
+    .sort()
+    .forEach(name => {
 
+      const option =
+        document.createElement(
+          "option"
+        );
 
-  activityNames.forEach(name => {
+      option.value = name;
+      option.textContent = name;
 
-    const option =
-      document.createElement(
-        "option"
+      select.appendChild(
+        option
       );
 
-
-    option.value =
-      name;
-
-
-    option.textContent =
-      name;
-
-
-    select.appendChild(
-      option
-    );
-
-  });
+    });
 
 
   const sets =
     document.createElement("input");
 
-
-  sets.type =
-    "number";
-
-
+  sets.type = "number";
+  sets.step = "any";
+  sets.min = "0";
+  sets.value = "1";
   sets.className =
     "sets-input";
 
 
-  sets.min =
-    "1";
-
-
-  sets.value =
-    "1";
-
-
   const remove =
-    document.createElement(
-      "button"
-    );
-
+    document.createElement("button");
 
   remove.className =
     "remove";
-
 
   remove.textContent =
     "✕";
@@ -548,33 +639,36 @@ function addActivityRow() {
 
       row.remove();
 
+      markPlanDirty();
+
     };
 
 
-  row.appendChild(
-    select
-  );
+  select.onchange =
+    markPlanDirty;
 
 
-  row.appendChild(
-    sets
-  );
+  sets.oninput =
+    markPlanDirty;
 
 
-  row.appendChild(
-    remove
-  );
+  row.appendChild(select);
+
+  row.appendChild(sets);
+
+  row.appendChild(remove);
 
 
-  container.appendChild(
-    row
-  );
+  container.appendChild(row);
+
+
+  markPlanDirty();
 
 }
 
 
 // =====================================================
-// GET SELECTED ACTIVITIES
+// SELECTIONS
 // =====================================================
 
 function getSelections() {
@@ -610,10 +704,8 @@ function getSelections() {
     ) {
 
       selections.push({
-
         activity: activity,
         sets: sets
-
       });
 
     }
@@ -627,26 +719,7 @@ function getSelections() {
 
 
 // =====================================================
-// CREATE API ACTIVITY STRING
-// =====================================================
-
-function createActivityString(
-  selections
-) {
-
-  return selections
-    .map(selection =>
-
-      `${selection.activity}:${selection.sets}`
-
-    )
-    .join(",");
-
-}
-
-
-// =====================================================
-// CALCULATE REQUIREMENTS
+// CALCULATE
 // =====================================================
 
 async function calculateRequirements() {
@@ -660,7 +733,7 @@ async function calculateRequirements() {
   ) {
 
     alert(
-      "Please select at least one activity."
+      "Select at least one activity."
     );
 
     return;
@@ -668,109 +741,78 @@ async function calculateRequirements() {
   }
 
 
-  const activityString =
-    createActivityString(
-      selections
-    );
+  const url =
+    `${API_URL}?action=calculateRequirements` +
+    `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
 
 
-  try {
-
-    const response =
-      await fetch(
-
-        `${API_URL}?action=calculateRequirements&activities=${encodeURIComponent(activityString)}`
-
-      );
+  const response =
+    await fetch(url);
 
 
-    const data =
-      await response.json();
+  const data =
+    await response.json();
 
 
-    if (!data.success) {
-
-      alert(
-        data.error ||
-        "Could not calculate requirements."
-      );
-
-      return;
-
-    }
-
-
-    currentRequirements =
-      data.requirements || [];
-
-
-    document
-      .getElementById(
-        "totalItems"
-      )
-      .textContent =
-        data.totalItems || 0;
-
-
-    document
-      .getElementById(
-        "sufficientItems"
-      )
-      .textContent =
-        data.sufficientItems || 0;
-
-
-    document
-      .getElementById(
-        "shortfallItems"
-      )
-      .textContent =
-        data.shortfallItems || 0;
-
-
-    renderRequirements(
-      currentRequirements
-    );
-
-
-    document
-      .getElementById(
-        "resultsSection"
-      )
-      .classList
-      .remove("hidden");
-
-
-    showAll();
-
-
-    document
-      .getElementById(
-        "message"
-      )
-      .textContent = "";
-
-
-  } catch (error) {
-
-    console.error(error);
+  if (!data.success) {
 
     alert(
-      "Could not calculate requirements."
+      data.error ||
+      "Calculation failed."
     );
 
+    return;
   }
+
+
+  currentRequirements =
+    data.requirements || [];
+
+
+  document
+    .getElementById(
+      "totalItems"
+    )
+    .textContent =
+      data.totalItems || 0;
+
+
+  document
+    .getElementById(
+      "sufficientItems"
+    )
+    .textContent =
+      data.sufficientItems || 0;
+
+
+  document
+    .getElementById(
+      "shortfallItems"
+    )
+    .textContent =
+      data.shortfallItems || 0;
+
+
+  renderRequirements(
+    currentRequirements
+  );
+
+
+  document
+    .getElementById(
+      "resultsSection"
+    )
+    .classList
+    .remove("hidden");
 
 }
 
 
 // =====================================================
-// RENDER REQUIREMENTS
+// REQUIREMENTS TABLE
 // =====================================================
 
-function renderRequirements(
-  requirements
-) {
+function renderRequirements(list) {
 
   const table =
     document.getElementById(
@@ -781,73 +823,42 @@ function renderRequirements(
   table.innerHTML = "";
 
 
-  requirements.forEach(item => {
+  list.forEach(item => {
 
     const row =
       document.createElement("tr");
 
 
-    row.dataset.shortfall =
-      item.shortfall > 0
-        ? "yes"
-        : "no";
-
-
     if (
       item.shortfall > 0
     ) {
-
-      row.classList.add(
-        "shortfall-row"
-      );
-
+      row.className =
+        "shortfall";
     }
-
-
-    const status =
-      item.shortfall > 0
-        ? `<span class="top-up">TOP UP</span>`
-        : `<span class="enough">Enough</span>`;
-
-
-    const remainingClass =
-      item.remaining < 0
-        ? "negative"
-        : "";
 
 
     row.innerHTML = `
 
       <td>
-        <strong>${item.item}</strong>
+        <strong>${escapeHtml(item.item)}</strong>
       </td>
 
-      <td>
-        ${item.have}
-      </td>
+      <td>${item.have}</td>
 
-      <td>
-        ${item.need}
-      </td>
+      <td>${item.need}</td>
 
-      <td class="${item.shortfall > 0 ? "top-up" : ""}">
+      <td class="${item.shortfall > 0 ? "bad" : ""}">
         ${item.shortfall}
       </td>
 
-      <td class="${remainingClass}">
+      <td class="${item.remaining < 0 ? "bad" : ""}">
         ${item.remaining}
-      </td>
-
-      <td>
-        ${status}
       </td>
 
     `;
 
 
-    table.appendChild(
-      row
-    );
+    table.appendChild(row);
 
   });
 
@@ -855,99 +866,119 @@ function renderRequirements(
 
 
 // =====================================================
-// SHOW ALL ITEMS
+// PLAN CHANGED
 // =====================================================
 
-function showAll() {
+function markPlanDirty() {
 
-  const rows =
-    document.querySelectorAll(
-      "#requirementsTable tr"
-    );
+  if (currentOrderId) {
 
-
-  rows.forEach(row => {
-
-    row.style.display = "";
-
-  });
+    currentOrderId = "";
 
 
-  document
-    .getElementById(
-      "allButton"
-    )
-    .classList
-    .add("active");
+    document
+      .getElementById(
+        "savedOrderInfo"
+      )
+      .classList
+      .add("hidden");
 
 
-  document
-    .getElementById(
-      "shortfallButton"
-    )
-    .classList
-    .remove("active");
+    document
+      .getElementById(
+        "viewCurrentButton"
+      )
+      .classList
+      .add("hidden");
+
+  }
 
 }
 
 
 // =====================================================
-// SHOW SHORTFALL ONLY
+// SAVE ORDER
 // =====================================================
 
-function showShortfall() {
+async function saveOrder() {
 
-  const rows =
-    document.querySelectorAll(
-      "#requirementsTable tr"
+  const result =
+    await saveOrderInternal(true);
+
+
+  if (result) {
+
+    alert(
+      `Order saved as ${result}`
     );
 
-
-  rows.forEach(row => {
-
-    if (
-      row.dataset.shortfall ===
-      "yes"
-    ) {
-
-      row.style.display = "";
-
-    } else {
-
-      row.style.display =
-        "none";
-
-    }
-
-  });
-
-
-  document
-    .getElementById(
-      "shortfallButton"
-    )
-    .classList
-    .add("active");
-
-
-  document
-    .getElementById(
-      "allButton"
-    )
-    .classList
-    .remove("active");
+  }
 
 }
 
 
-// =====================================================
-// SAVE SUMMARY TO GOOGLE SHEETS
-// =====================================================
+async function saveOrderInternal(
+  reloadOrders
+) {
 
-async function saveSummary() {
+  if (currentOrderId) {
+
+    return currentOrderId;
+
+  }
+
+
+  const orderName =
+    document
+      .getElementById(
+        "orderName"
+      )
+      .value
+      .trim();
+
+
+  const createdBy =
+    document
+      .getElementById(
+        "createdBy"
+      )
+      .value
+      .trim();
+
+
+  const notes =
+    document
+      .getElementById(
+        "notes"
+      )
+      .value
+      .trim();
+
 
   const selections =
     getSelections();
+
+
+  if (!orderName) {
+
+    alert(
+      "Enter an Order Name."
+    );
+
+    return null;
+
+  }
+
+
+  if (!createdBy) {
+
+    alert(
+      "Enter Prepared By."
+    );
+
+    return null;
+
+  }
 
 
   if (
@@ -955,7 +986,359 @@ async function saveSummary() {
   ) {
 
     alert(
-      "Please select at least one activity."
+      "Select at least one activity."
+    );
+
+    return null;
+
+  }
+
+
+  const url =
+    `${API_URL}?action=saveOrder` +
+    `&orderName=${encodeURIComponent(orderName)}` +
+    `&createdBy=${encodeURIComponent(createdBy)}` +
+    `&notes=${encodeURIComponent(notes)}` +
+    `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
+
+
+  const response =
+    await fetch(url);
+
+
+  const data =
+    await response.json();
+
+
+  if (!data.success) {
+
+    alert(
+      data.error ||
+      "Could not save order."
+    );
+
+    return null;
+
+  }
+
+
+  currentOrderId =
+    data.orderId;
+
+
+  const info =
+    document.getElementById(
+      "savedOrderInfo"
+    );
+
+
+  info.textContent =
+    `Saved as ${data.orderId} — ${data.orderName}`;
+
+
+  info.classList
+    .remove("hidden");
+
+
+  document
+    .getElementById(
+      "viewCurrentButton"
+    )
+    .classList
+    .remove("hidden");
+
+
+  if (reloadOrders) {
+
+    await loadOrders();
+
+  }
+
+
+  return currentOrderId;
+
+}
+
+
+// =====================================================
+// WITHDRAW FULL ORDER
+// =====================================================
+
+async function withdrawCurrentOrder(
+  force
+) {
+
+  let orderId =
+    currentOrderId;
+
+
+  if (!orderId) {
+
+    orderId =
+      await saveOrderInternal(
+        true
+      );
+
+  }
+
+
+  if (!orderId) {
+    return;
+  }
+
+
+  const name =
+    document
+      .getElementById(
+        "createdBy"
+      )
+      .value
+      .trim();
+
+
+  const url =
+    `${API_URL}?action=withdrawOrder` +
+    `&orderId=${encodeURIComponent(orderId)}` +
+    `&name=${encodeURIComponent(name)}` +
+    `&force=${force}`;
+
+
+  const response =
+    await fetch(url);
+
+
+  const data =
+    await response.json();
+
+
+  if (
+    data.requiresConfirmation
+  ) {
+
+    showWarning(
+      data.shortages || []
+    );
+
+    return;
+  }
+
+
+  if (!data.success) {
+
+    alert(
+      data.error ||
+      "Withdrawal failed."
+    );
+
+    return;
+  }
+
+
+  alert(
+    `${orderId} withdrawn successfully.`
+  );
+
+}
+
+
+// =====================================================
+// SHORTAGE WARNING
+// =====================================================
+
+function showWarning(
+  shortages
+) {
+
+  const content =
+    document.getElementById(
+      "warningContent"
+    );
+
+
+  content.innerHTML = "";
+
+
+  shortages.forEach(item => {
+
+    const p =
+      document.createElement("p");
+
+
+    p.innerHTML =
+      `<strong>${escapeHtml(item.item)}</strong><br>` +
+      `Available: ${item.available}<br>` +
+      `Required: ${item.requested}<br>` +
+      `<strong>Shortfall: ${item.shortfall}</strong><br>` +
+      `New stock: ${item.newQty}`;
+
+
+    content.appendChild(p);
+
+  });
+
+
+  document
+    .getElementById(
+      "warningModal"
+    )
+    .style.display =
+      "flex";
+
+}
+
+
+function closeWarning() {
+
+  document
+    .getElementById(
+      "warningModal"
+    )
+    .style.display =
+      "none";
+
+}
+
+
+async function withdrawAnyway() {
+
+  closeWarning();
+
+  await withdrawCurrentOrder(
+    true
+  );
+
+}
+
+
+// =====================================================
+// EXISTING ORDERS
+// =====================================================
+
+async function loadOrders() {
+
+  const response =
+    await fetch(
+      `${API_URL}?action=getOrders`
+    );
+
+
+  const data =
+    await response.json();
+
+
+  if (!data.success) {
+    return;
+  }
+
+
+  orders =
+    data.orders || [];
+
+
+  renderOrders(orders);
+
+}
+
+
+function renderOrders(list) {
+
+  const select =
+    document.getElementById(
+      "existingOrderSelect"
+    );
+
+
+  select.innerHTML = "";
+
+
+  list.forEach(order => {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+
+    option.value =
+      order.orderId;
+
+
+    option.textContent =
+      `${order.orderId} — ${order.orderName}`;
+
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+function filterOrders() {
+
+  const search =
+    document
+      .getElementById(
+        "orderSearch"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    orders.filter(order => {
+
+      return (
+        order.orderId
+          .toLowerCase()
+          .includes(search)
+        ||
+        order.orderName
+          .toLowerCase()
+          .includes(search)
+      );
+
+    });
+
+
+  renderOrders(filtered);
+
+}
+
+
+// =====================================================
+// VIEW SUMMARY
+// =====================================================
+
+async function viewCurrentOrderSummary() {
+
+  if (!currentOrderId) {
+    return;
+  }
+
+
+  await viewOrderSummary(
+    currentOrderId
+  );
+
+}
+
+
+async function viewSelectedOrderSummary() {
+
+  const orderId =
+    document
+      .getElementById(
+        "existingOrderSelect"
+      )
+      .value;
+
+
+  if (!orderId) {
+
+    alert(
+      "Select an order."
     );
 
     return;
@@ -963,73 +1346,144 @@ async function saveSummary() {
   }
 
 
-  const activityString =
-    createActivityString(
-      selections
+  await viewOrderSummary(
+    orderId
+  );
+
+}
+
+
+async function viewOrderSummary(
+  orderId
+) {
+
+  const response =
+    await fetch(
+      `${API_URL}?action=getOrderSummary&orderId=${encodeURIComponent(orderId)}&write=1`
     );
 
 
-  const message =
-    document.getElementById(
-      "message"
+  const data =
+    await response.json();
+
+
+  if (!data.success) {
+
+    alert(
+      data.error ||
+      "Could not load order."
     );
 
-
-  message.textContent =
-    "Saving summary...";
-
-
-  try {
-
-    const response =
-      await fetch(
-
-        `${API_URL}?action=saveSummary&activities=${encodeURIComponent(activityString)}`
-
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if (!data.success) {
-
-      message.textContent =
-        data.error ||
-        "Could not save summary.";
-
-      return;
-
-    }
-
-
-    message.textContent =
-      "✓ Summary saved to Google Sheets.";
-
-
-  } catch (error) {
-
-    console.error(error);
-
-
-    message.textContent =
-      "Could not save summary.";
+    return;
 
   }
+
+
+  document
+    .getElementById(
+      "orderSummaryTitle"
+    )
+    .textContent =
+      `${data.order.orderId} — ${data.order.orderName}`;
+
+
+  document
+    .getElementById(
+      "orderMeta"
+    )
+    .innerHTML = `
+
+      <p>
+        <strong>Created By:</strong>
+        ${escapeHtml(data.order.createdBy)}
+      </p>
+
+      <p>
+        <strong>Created At:</strong>
+        ${escapeHtml(data.order.createdAt)}
+      </p>
+
+    `;
+
+
+  const table =
+    document.getElementById(
+      "orderSummaryTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  data.items.forEach(item => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td>
+        ${escapeHtml(item.item)}
+      </td>
+
+      <td>${item.planned}</td>
+
+      <td>${item.withdrawn}</td>
+
+      <td>${item.returned}</td>
+
+      <td>
+        <strong>${item.expended}</strong>
+      </td>
+
+    `;
+
+
+    table.appendChild(row);
+
+  });
+
+
+  document
+    .getElementById(
+      "orderSummarySection"
+    )
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById(
+      "orderSummarySection"
+    )
+    .scrollIntoView({
+      behavior: "smooth"
+    });
 
 }
 
 
 // =====================================================
-// START
+// HTML SAFETY
 // =====================================================
 
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
 window.onload =
-  loadActivities;
+  loadPage;
 
 </script>
 
 </body>
-
 </html>
