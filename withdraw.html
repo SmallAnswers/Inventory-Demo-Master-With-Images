@@ -5,32 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial;
       background: #eef2f3;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      padding: 20px;
     }
 
     .card {
       background: white;
       padding: 25px;
       border-radius: 16px;
-      width: 360px;
+      max-width: 500px;
+      margin: auto;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
     }
 
     label {
       font-size: 13px;
       color: #666;
+      display: block;
+      margin-top: 14px;
     }
 
     input, select {
@@ -58,81 +59,601 @@
       cursor: pointer;
     }
 
-    .add { background: #f1c40f; }
-    .submit { background: #27ae60; color: white; }
+    .add {
+      background: #f1c40f;
+    }
+
+    .submit {
+      background: #27ae60;
+      color: white;
+    }
+
+    .back {
+      background: #7f8c8d;
+      color: white;
+    }
+
+    .remove {
+      background: #e74c3c;
+      color: white;
+      padding: 7px;
+    }
+
+    .optional {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 15px;
+      padding: 22px;
+    }
+
+    .warning {
+      color: #c0392b;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .cancel {
+      background: #ddd;
+    }
+
+    .anyway {
+      background: #e74c3c;
+      color: white;
+    }
   </style>
 </head>
 
 <body>
 
 <div class="card">
+
   <h2>Withdraw Items</h2>
 
   <label>Name</label>
   <input id="name">
 
+  <label>
+    Order
+    <span class="optional">(Optional)</span>
+  </label>
+
+  <input
+    id="orderSearch"
+    placeholder="Search order..."
+    oninput="filterOrders()"
+  >
+
+  <select id="orderSelect">
+    <option value="">
+      No Order / Ad-hoc
+    </option>
+  </select>
+
   <div id="itemsContainer"></div>
 
-  <button class="add" onclick="addRow()">+ Add Item</button>
-  <button class="submit" onclick="submitAll()">Submit All</button>
+  <button
+    class="add"
+    onclick="addRow()">
+    + Add Item
+  </button>
+
+  <button
+    class="submit"
+    onclick="submitAll(false)">
+    Confirm Withdrawal
+  </button>
+
+  <button
+    class="back"
+    onclick="location.href='index.html'">
+    Back
+  </button>
+
 </div>
 
+
+<div
+  id="warningModal"
+  class="modal-bg">
+
+  <div class="modal">
+
+    <h3 class="warning">
+      ⚠️ Insufficient Stock
+    </h3>
+
+    <div id="warningContent"></div>
+
+    <p>
+      Continuing will allow the affected
+      inventory quantities to become negative.
+    </p>
+
+    <div class="modal-buttons">
+
+      <button
+        class="cancel"
+        onclick="closeWarning()">
+        Cancel
+      </button>
+
+      <button
+        class="anyway"
+        onclick="withdrawAnyway()">
+        Withdraw Anyway
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzH7wQC_n2h135FTLZbr3dTwhR8W3g9WiB-ltA_lfi2qVO9boEmrepOuA4i8l-RASY/exec";
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
 
 let inventory = [];
+let orders = [];
 
-async function loadItems() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
-  inventory = data.inventory;
 
-  addRow();
+// =====================================================
+// LOAD
+// =====================================================
+
+async function loadPage() {
+
+  try {
+
+    const [
+      inventoryResponse,
+      ordersResponse
+    ] = await Promise.all([
+
+      fetch(API_URL),
+
+      fetch(
+        `${API_URL}?action=getOrders`
+      )
+
+    ]);
+
+
+    const inventoryData =
+      await inventoryResponse.json();
+
+    const orderData =
+      await ordersResponse.json();
+
+
+    inventory =
+      inventoryData.inventory || [];
+
+
+    orders =
+      orderData.orders || [];
+
+
+    renderOrders(orders);
+
+    addRow();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Could not load inventory."
+    );
+
+  }
+
 }
+
+
+// =====================================================
+// ORDERS
+// =====================================================
+
+function renderOrders(list) {
+
+  const select =
+    document.getElementById(
+      "orderSelect"
+    );
+
+
+  select.innerHTML =
+    `<option value="">
+      No Order / Ad-hoc
+    </option>`;
+
+
+  list.forEach(order => {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+
+    option.value =
+      order.orderId;
+
+
+    option.textContent =
+      `${order.orderId} — ${order.orderName}`;
+
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+function filterOrders() {
+
+  const search =
+    document
+      .getElementById(
+        "orderSearch"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    orders.filter(order => {
+
+      return (
+        order.orderName
+          .toLowerCase()
+          .includes(search)
+        ||
+        order.orderId
+          .toLowerCase()
+          .includes(search)
+      );
+
+    });
+
+
+  renderOrders(filtered);
+
+}
+
+
+// =====================================================
+// ITEM ROW
+// =====================================================
 
 function addRow() {
-  const container = document.getElementById("itemsContainer");
 
-  const div = document.createElement("div");
-  div.className = "item-row";
+  const container =
+    document.getElementById(
+      "itemsContainer"
+    );
 
-  let options = inventory.map(i =>
-    `<option value="${i.name}">${i.name} (${i.qty})</option>`
-  ).join("");
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.className =
+    "item-row";
+
+
+  const options =
+    inventory
+      .map(i =>
+        `<option value="${escapeHtml(i.name)}">
+          ${escapeHtml(i.name)} (${i.qty})
+        </option>`
+      )
+      .join("");
+
 
   div.innerHTML = `
-    <select class="item">${options}</select>
-    <input type="number" class="qty" placeholder="Quantity">
+
+    <select class="item">
+      ${options}
+    </select>
+
+    <input
+      type="number"
+      step="any"
+      min="0"
+      class="qty"
+      placeholder="Quantity"
+    >
+
+    <button
+      class="remove"
+      type="button">
+      Remove
+    </button>
+
   `;
 
+
+  div
+    .querySelector(".remove")
+    .onclick =
+      function() {
+        div.remove();
+      };
+
+
   container.appendChild(div);
+
 }
 
-async function submitAll() {
-  const name = document.getElementById("name").value;
+
+// =====================================================
+// COLLECT ITEMS
+// =====================================================
+
+function getItems() {
+
+  const rows =
+    document.querySelectorAll(
+      ".item-row"
+    );
+
+
+  const items = [];
+
+
+  rows.forEach(row => {
+
+    const item =
+      row.querySelector(
+        ".item"
+      ).value;
+
+
+    const qty =
+      Number(
+        row.querySelector(
+          ".qty"
+        ).value
+      );
+
+
+    if (
+      item &&
+      qty > 0
+    ) {
+
+      items.push({
+        item: item,
+        qty: qty
+      });
+
+    }
+
+  });
+
+
+  return items;
+
+}
+
+
+// =====================================================
+// SUBMIT
+// =====================================================
+
+async function submitAll(force) {
+
+  const name =
+    document
+      .getElementById("name")
+      .value
+      .trim();
+
 
   if (!name) {
     alert("Enter name");
     return;
   }
 
-  const rows = document.querySelectorAll(".item-row");
 
-  for (let row of rows) {
-    const item = row.querySelector(".item").value;
-    const qty = row.querySelector(".qty").value;
+  const items =
+    getItems();
 
-    if (!qty) continue;
 
-    const url = `${API_URL}?action=withdraw&name=${encodeURIComponent(name)}&item=${encodeURIComponent(item)}&qty=${qty}`;
-    await fetch(url);
+  if (
+    items.length === 0
+  ) {
+    alert(
+      "Add at least one item."
+    );
+    return;
   }
 
-  alert("All items withdrawn!");
-  window.location.href = "index.html";
+
+  const orderId =
+    document
+      .getElementById(
+        "orderSelect"
+      ).value;
+
+
+  const url =
+    `${API_URL}?action=batchWithdraw` +
+    `&name=${encodeURIComponent(name)}` +
+    `&orderId=${encodeURIComponent(orderId)}` +
+    `&force=${force}` +
+    `&items=${encodeURIComponent(JSON.stringify(items))}`;
+
+
+  try {
+
+    const response =
+      await fetch(url);
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      data.requiresConfirmation
+    ) {
+
+      showWarning(
+        data.shortages || []
+      );
+
+      return;
+    }
+
+
+    if (!data.success) {
+
+      alert(
+        data.error ||
+        "Withdrawal failed."
+      );
+
+      return;
+    }
+
+
+    alert(
+      "All items withdrawn!"
+    );
+
+
+    window.location.href =
+      "index.html";
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Withdrawal failed."
+    );
+
+  }
+
 }
 
-window.onload = loadItems;
+
+// =====================================================
+// WARNING
+// =====================================================
+
+function showWarning(
+  shortages
+) {
+
+  const content =
+    document.getElementById(
+      "warningContent"
+    );
+
+
+  content.innerHTML = "";
+
+
+  shortages.forEach(item => {
+
+    const p =
+      document.createElement("p");
+
+
+    p.innerHTML =
+      `<strong>${escapeHtml(item.item)}</strong><br>` +
+      `Available: ${item.available}<br>` +
+      `Requested: ${item.requested}<br>` +
+      `<strong>Shortfall: ${item.shortfall}</strong><br>` +
+      `New stock: ${item.newQty}`;
+
+
+    content.appendChild(p);
+
+  });
+
+
+  document
+    .getElementById(
+      "warningModal"
+    )
+    .style.display =
+      "flex";
+
+}
+
+
+function closeWarning() {
+
+  document
+    .getElementById(
+      "warningModal"
+    )
+    .style.display =
+      "none";
+
+}
+
+
+async function withdrawAnyway() {
+
+  closeWarning();
+
+  await submitAll(true);
+
+}
+
+
+// =====================================================
+// HTML SAFETY
+// =====================================================
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+window.onload =
+  loadPage;
+
 </script>
 
 </body>
