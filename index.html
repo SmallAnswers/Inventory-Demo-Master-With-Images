@@ -55,8 +55,20 @@
       font-weight: bold;
     }
 
-    .withdraw { background: #27ae60; color: white; }
-    .return { background: #3498db; color: white; }
+    .withdraw {
+      background: #27ae60;
+      color: white;
+    }
+
+    .return {
+      background: #3498db;
+      color: white;
+    }
+
+    .summary {
+      background: #8e44ad;
+      color: white;
+    }
 
     .actions {
       text-align: center;
@@ -68,26 +80,43 @@
 
 <div class="container">
 
-<h1>Inventory Dashboard</h1>
+  <h1>Inventory Dashboard</h1>
 
-<select id="categoryFilter" onchange="filterItems()">
-  <option value="">All Categories</option>
-</select>
+  <select id="categoryFilter" onchange="filterItems()">
+    <option value="">All Categories</option>
+  </select>
 
-<div class="card">
-  <h3>Stock</h3>
-  <div id="inventoryList"></div>
-</div>
+  <div class="card">
+    <h3>Stock</h3>
+    <div id="inventoryList"></div>
+  </div>
 
-<div class="card">
-  <h3>Recent Activity</h3>
-  <ul id="logList"></ul>
-</div>
+  <div class="card">
+    <h3>Recent Activity</h3>
+    <ul id="logList"></ul>
+  </div>
 
-<div class="actions">
-  <button class="withdraw" onclick="location.href='withdraw.html'">Withdraw</button>
-  <button class="return" onclick="location.href='return.html'">Return</button>
-</div>
+  <div class="actions">
+
+    <button
+      class="withdraw"
+      onclick="location.href='withdraw.html'">
+      Withdraw
+    </button>
+
+    <button
+      class="return"
+      onclick="location.href='return.html'">
+      Return
+    </button>
+
+    <button
+      class="summary"
+      onclick="location.href='summary.html'">
+      Requirements Summary
+    </button>
+
+  </div>
 
 </div>
 
