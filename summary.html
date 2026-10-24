@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-
   <title>Plan Equipment / Orders</title>
 
   <meta
@@ -10,7 +9,6 @@
   >
 
   <style>
-
     * {
       box-sizing: border-box;
     }
@@ -249,6 +247,17 @@
       border-bottom: none;
     }
 
+    .fully-withdrawn {
+      padding: 12px;
+      background: #edf8ef;
+      border-radius: 8px;
+      margin-top: 15px;
+      color: #1e8449;
+      font-weight: bold;
+    }
+
+    /* MODALS */
+
     .modal-bg {
       display: none;
       position: fixed;
@@ -263,11 +272,28 @@
     .modal {
       background: white;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       max-height: 85vh;
       overflow-y: auto;
       border-radius: 14px;
       padding: 22px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+    }
+
+    .duplicate-box {
+      padding: 12px;
+      background: #fff9e6;
+      border-radius: 8px;
+      margin: 15px 0;
     }
 
     .warning-box {
@@ -284,38 +310,11 @@
       margin-bottom: 10px;
     }
 
-    .duplicate-box {
-      padding: 12px;
-      background: #fff9e6;
-      border-radius: 8px;
-      margin: 15px 0;
-    }
-
     .warning {
       color: #c0392b;
     }
 
-    .modal-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .modal-buttons button {
-      flex: 1;
-    }
-
-    .fully-withdrawn {
-      padding: 12px;
-      background: #edf8ef;
-      border-radius: 8px;
-      margin-top: 15px;
-      color: #1e8449;
-      font-weight: bold;
-    }
-
     @media(max-width: 650px) {
-
       .activity-row {
         grid-template-columns: 1fr 80px 45px;
       }
@@ -341,11 +340,8 @@
       .modal-buttons {
         flex-direction: column;
       }
-
     }
-
   </style>
-
 </head>
 
 
@@ -364,12 +360,11 @@
 
     <h2>Create New Order</h2>
 
-
     <label>Order Name</label>
 
     <input
       id="orderName"
-      placeholder="e.g. Naval Base Sec 1 Camp"
+      placeholder="Tip: Reusing the same Order Name will prompt you to open the existing Order or create a new one."
       oninput="markPlanDirty()"
     >
 
@@ -558,7 +553,7 @@
 
 
   <!-- ================================================= -->
-  <!-- SAVED ORDER SUMMARY -->
+  <!-- ORDER SUMMARY -->
   <!-- ================================================= -->
 
   <div
@@ -604,7 +599,9 @@
     </div>
 
 
-    <!-- WITHDRAWAL CONTROLS -->
+    <!-- ================================================= -->
+    <!-- ORDER WITHDRAWAL -->
+    <!-- ================================================= -->
 
     <div class="withdraw-section">
 
@@ -672,8 +669,7 @@
         </p>
 
 
-        <div id="partialItems">
-        </div>
+        <div id="partialItems"></div>
 
 
         <div class="button-row">
@@ -731,7 +727,7 @@
     <h3>Order Already Exists</h3>
 
     <p>
-      An Order with the same name already exists.
+      An Order with this name already exists.
     </p>
 
 
@@ -748,9 +744,7 @@
 
 
     <p>
-      Would you like to open the existing Order,
-      deliberately create another Order with the same
-      name, or cancel?
+      Choose what you want to do:
     </p>
 
 
@@ -816,6 +810,7 @@
     <div class="modal-buttons">
 
       <button
+        class="cancel"
         onclick="closeWarning()"
       >
         Cancel
@@ -989,18 +984,14 @@ function addActivityRow() {
   sets.type =
     "number";
 
-
   sets.step =
     "any";
-
 
   sets.min =
     "0";
 
-
   sets.value =
     "1";
-
 
   sets.className =
     "sets-input";
@@ -1014,7 +1005,6 @@ function addActivityRow() {
 
   remove.className =
     "remove";
-
 
   remove.textContent =
     "✕";
@@ -1072,7 +1062,8 @@ function getSelections() {
     );
 
 
-  const selections = [];
+  const selections =
+    [];
 
 
   rows.forEach(row => {
@@ -1222,7 +1213,7 @@ async function calculateRequirements() {
 
 
 // =====================================================
-// RENDER PLANNING REQUIREMENTS
+// RENDER REQUIREMENTS
 // =====================================================
 
 function renderRequirements(list) {
@@ -1233,7 +1224,8 @@ function renderRequirements(list) {
     );
 
 
-  table.innerHTML = "";
+  table.innerHTML =
+    "";
 
 
   list.forEach(item => {
@@ -1303,7 +1295,7 @@ function renderRequirements(list) {
 
 
 // =====================================================
-// MARK PLAN AS CHANGED
+// MARK PLAN DIRTY
 // =====================================================
 
 function markPlanDirty() {
@@ -1332,7 +1324,7 @@ function markPlanDirty() {
 
 // =====================================================
 // NORMALISE ORDER NAME
-// Case-insensitive + ignores extra spaces.
+// Case insensitive + ignores extra spaces.
 // =====================================================
 
 function normaliseOrderName(value) {
@@ -1377,8 +1369,8 @@ async function saveOrder() {
 
 
   /*
-    If this plan was already saved during this
-    browser session, just reopen the same Order.
+    This exact plan was already saved
+    during the current browser session.
   */
 
   if (
@@ -1413,8 +1405,13 @@ async function saveOrder() {
 
 
   /*
-    Existing same-name Order found.
-    DO NOT create anything yet.
+    SAME ORDER NAME FOUND.
+
+    IMPORTANT:
+    We DO NOT use confirm() here.
+
+    We show our custom modal instead,
+    which has the THREE options.
   */
 
   if (
@@ -1431,7 +1428,7 @@ async function saveOrder() {
 
 
   /*
-    No duplicate.
+    No duplicate found.
     Save normally.
   */
 
@@ -1441,7 +1438,7 @@ async function saveOrder() {
 
 
 // =====================================================
-// DUPLICATE ORDER MODAL
+// SHOW 3-OPTION DUPLICATE MODAL
 // =====================================================
 
 function showDuplicateOrderModal(
@@ -1492,7 +1489,7 @@ function showDuplicateOrderModal(
 
 
 // =====================================================
-// CLOSE DUPLICATE ORDER MODAL
+// CLOSE DUPLICATE MODAL
 // =====================================================
 
 function closeDuplicateOrderModal() {
@@ -1508,7 +1505,8 @@ function closeDuplicateOrderModal() {
 
 
 // =====================================================
-// OPEN EXISTING DUPLICATE ORDER
+// DUPLICATE OPTION 1:
+// OPEN EXISTING ORDER
 // =====================================================
 
 async function openExistingDuplicateOrder() {
@@ -1531,11 +1529,6 @@ async function openExistingDuplicateOrder() {
   closeDuplicateOrderModal();
 
 
-  /*
-    Select the same Order in the Existing Orders
-    dropdown where possible.
-  */
-
   const existingSelect =
     document.getElementById(
       "existingOrderSelect"
@@ -1545,7 +1538,8 @@ async function openExistingDuplicateOrder() {
   const exists =
     [...existingSelect.options]
       .some(option =>
-        option.value === orderId
+        option.value ===
+        orderId
       );
 
 
@@ -1565,7 +1559,8 @@ async function openExistingDuplicateOrder() {
 
 
 // =====================================================
-// CREATE SAME-NAME ORDER ANYWAY
+// DUPLICATE OPTION 2:
+// CREATE NEW ORDER ANYWAY
 // =====================================================
 
 async function createDuplicateOrderAnyway() {
@@ -1579,7 +1574,7 @@ async function createDuplicateOrderAnyway() {
 
 
 // =====================================================
-// ACTUAL SAVE AFTER DUPLICATE CHECK
+// SAVE CONFIRMED ORDER
 // =====================================================
 
 async function saveOrderConfirmed() {
@@ -1603,10 +1598,6 @@ async function saveOrderConfirmed() {
   await loadOrders();
 
 
-  /*
-    Immediately open the newly created Order.
-  */
-
   await viewOrderSummary(
     orderId
   );
@@ -1615,7 +1606,7 @@ async function saveOrderConfirmed() {
 
 
 // =====================================================
-// SAVE ORDER INTERNAL
+// SAVE ORDER TO BACKEND
 // =====================================================
 
 async function saveOrderInternal() {
@@ -1765,7 +1756,7 @@ async function saveOrderInternal() {
 
 
 // =====================================================
-// LOAD SAVED ORDERS
+// LOAD ORDERS
 // =====================================================
 
 async function loadOrders() {
@@ -1799,7 +1790,7 @@ async function loadOrders() {
 
 
 // =====================================================
-// RENDER ORDER DROPDOWN
+// RENDER ORDERS
 // =====================================================
 
 function renderOrders(list) {
@@ -1844,7 +1835,8 @@ function renderOrders(list) {
   if (
     [...select.options]
       .some(option =>
-        option.value === current
+        option.value ===
+        current
       )
   ) {
 
@@ -1877,13 +1869,17 @@ function filterOrders() {
 
       order.orderId
         .toLowerCase()
-        .includes(search)
+        .includes(
+          search
+        )
 
       ||
 
       order.orderName
         .toLowerCase()
-        .includes(search)
+        .includes(
+          search
+        )
 
     );
 
@@ -1896,7 +1892,7 @@ function filterOrders() {
 
 
 // =====================================================
-// VIEW SELECTED SAVED ORDER
+// VIEW SELECTED ORDER
 // =====================================================
 
 async function viewSelectedOrderSummary() {
@@ -2027,7 +2023,8 @@ async function viewOrderSummary(orderId) {
 
 
       if (
-        item.remainingToWithdraw === 0
+        item.remainingToWithdraw ===
+        0
       ) {
 
         row.classList
@@ -2089,11 +2086,14 @@ async function viewOrderSummary(orderId) {
 
 
     if (
-      !withdrawalName.value.trim()
+      !withdrawalName
+        .value
+        .trim()
     ) {
 
       withdrawalName.value =
-        data.order.createdBy || "";
+        data.order.createdBy ||
+        "";
 
     }
 
@@ -2149,7 +2149,7 @@ async function viewOrderSummary(orderId) {
 
 
 // =====================================================
-// SHOW / HIDE WITHDRAW BUTTONS
+// WITHDRAW BUTTON STATE
 // =====================================================
 
 function updateWithdrawalButtons(
@@ -2180,7 +2180,9 @@ function updateWithdrawalButtons(
     );
 
 
-  if (hasRemaining) {
+  if (
+    hasRemaining
+  ) {
 
     buttonContainer
       .classList
@@ -2340,7 +2342,7 @@ function hidePartialWithdrawal() {
 
 
 // =====================================================
-// RENDER PARTIAL WITHDRAWAL ITEMS
+// RENDER PARTIAL ITEMS
 // =====================================================
 
 function renderPartialItems() {
@@ -2368,9 +2370,9 @@ function renderPartialItems() {
     .items
     .forEach(item => {
 
-
       if (
-        item.remainingToWithdraw <= 0
+        item.remainingToWithdraw <=
+        0
       ) {
 
         return;
@@ -2436,7 +2438,7 @@ function renderPartialItems() {
 
 
 // =====================================================
-// GET PARTIAL WITHDRAWAL ITEMS
+// GET PARTIAL ITEMS
 // =====================================================
 
 function getPartialItems() {
@@ -2636,7 +2638,7 @@ async function processOrderWithdrawal(
 
 
 // =====================================================
-// WITHDRAWAL WARNING MODAL
+// WITHDRAWAL WARNING
 // =====================================================
 
 function showWarning(
@@ -2800,7 +2802,7 @@ function showWarning(
 
 
 // =====================================================
-// CLOSE WITHDRAWAL WARNING
+// CLOSE WARNING
 // =====================================================
 
 function closeWarning() {
@@ -2853,7 +2855,7 @@ async function withdrawAnyway() {
 
 
 // =====================================================
-// ESCAPE HTML
+// HTML SAFETY
 // =====================================================
 
 function escapeHtml(value) {
