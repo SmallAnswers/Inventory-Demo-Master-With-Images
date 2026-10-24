@@ -6,7 +6,8 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1">
+    content="width=device-width, initial-scale=1"
+  >
 
   <style>
 
@@ -16,7 +17,7 @@
 
     body {
       margin: 0;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       background: #eef2f3;
       padding: 20px;
       color: #333;
@@ -31,14 +32,16 @@
       text-align: center;
     }
 
+    h2 {
+      margin-top: 0;
+    }
+
     .card {
       background: white;
       padding: 20px;
       border-radius: 14px;
       margin-bottom: 20px;
-      box-shadow:
-        0 4px 12px
-        rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     label {
@@ -56,14 +59,15 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       margin-top: 5px;
+      font-family: Arial, sans-serif;
     }
 
     .activity-row {
       display: grid;
-      grid-template-columns:
-        1fr 110px 50px;
+      grid-template-columns: 1fr 110px 50px;
       gap: 10px;
       margin-top: 10px;
+      align-items: center;
     }
 
     button {
@@ -125,12 +129,12 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      margin-top: 10px;
     }
 
     .summary-cards {
       display: grid;
-      grid-template-columns:
-        repeat(3, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -168,8 +172,7 @@
     th,
     td {
       padding: 11px;
-      border-bottom:
-        1px solid #ddd;
+      border-bottom: 1px solid #ddd;
       text-align: left;
     }
 
@@ -186,7 +189,7 @@
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     .saved-order {
@@ -202,33 +205,41 @@
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 15px;
+      line-height: 1.7;
+    }
+
+    .withdraw-section {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px solid #eee;
     }
 
     .partial-box {
-      border:
-        1px solid #ddd;
+      border: 1px solid #ddd;
       padding: 15px;
       border-radius: 10px;
       margin-top: 20px;
+      background: #fafafa;
     }
 
     .partial-row {
       display: grid;
-      grid-template-columns:
-        1fr 120px;
+      grid-template-columns: 1fr 120px;
       gap: 10px;
       align-items: center;
-      padding: 8px 0;
-      border-bottom:
-        1px solid #eee;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .partial-row:last-child {
+      border-bottom: none;
     }
 
     .modal-bg {
       display: none;
       position: fixed;
       inset: 0;
-      background:
-        rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.55);
       align-items: center;
       justify-content: center;
       padding: 20px;
@@ -268,27 +279,37 @@
       gap: 10px;
     }
 
-    @media(max-width:650px) {
+    .fully-withdrawn {
+      padding: 12px;
+      background: #edf8ef;
+      border-radius: 8px;
+      margin-top: 15px;
+      color: #1e8449;
+      font-weight: bold;
+    }
+
+    @media(max-width: 650px) {
 
       .activity-row {
-        grid-template-columns:
-          1fr 80px 45px;
+        grid-template-columns: 1fr 80px 45px;
       }
 
       .summary-cards {
-        grid-template-columns:
-          1fr;
+        grid-template-columns: 1fr;
       }
 
       .partial-row {
-        grid-template-columns:
-          1fr;
+        grid-template-columns: 1fr;
       }
 
       th,
       td {
         font-size: 12px;
         padding: 8px;
+      }
+
+      .button-row button {
+        width: 100%;
       }
 
     }
@@ -302,140 +323,228 @@
 
 <div class="container">
 
-<h1>
-  Equipment Planning / Orders
-</h1>
+  <h1>Equipment Planning / Orders</h1>
 
 
-<!-- ================================================= -->
-<!-- CREATE NEW ORDER -->
-<!-- ================================================= -->
-
-<div class="card">
-
-  <h2>Create New Order</h2>
-
-
-  <label>
-    Order Name
-  </label>
-
-  <input
-    id="orderName"
-    placeholder="e.g. Naval Base Sec 1 Camp"
-    oninput="markPlanDirty()"
-  >
-
-
-  <label>
-    Prepared By
-  </label>
-
-  <input
-    id="createdBy"
-    placeholder="Name"
-    oninput="markPlanDirty()"
-  >
-
-
-  <label>
-    Notes (Optional)
-  </label>
-
-  <textarea
-    id="notes"
-    rows="2">
-  </textarea>
-
-
-  <h3>
-    Activities
-  </h3>
-
-  <div id="activityContainer">
-  </div>
-
-
-  <div class="button-row">
-
-    <button
-      class="add"
-      onclick="addActivityRow()">
-
-      + Add Activity
-
-    </button>
-
-
-    <button
-      class="calculate"
-      onclick="calculateRequirements()">
-
-      Calculate Requirements
-
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- PLANNING RESULT -->
-<!-- ================================================= -->
-
-<div
-  id="resultsSection"
-  class="hidden">
-
-  <div class="summary-cards">
-
-    <div class="summary-box">
-
-      <div
-        id="totalItems"
-        class="summary-number">
-        0
-      </div>
-
-      Equipment Types
-
-    </div>
-
-
-    <div class="summary-box">
-
-      <div
-        id="sufficientItems"
-        class="summary-number good">
-        0
-      </div>
-
-      Sufficient
-
-    </div>
-
-
-    <div class="summary-box">
-
-      <div
-        id="shortfallItems"
-        class="summary-number bad">
-        0
-      </div>
-
-      Need Top Up
-
-    </div>
-
-  </div>
-
+  <!-- ================================================= -->
+  <!-- CREATE NEW ORDER -->
+  <!-- ================================================= -->
 
   <div class="card">
 
-    <h2>
-      Planned Requirements
+    <h2>Create New Order</h2>
+
+
+    <label>Order Name</label>
+
+    <input
+      id="orderName"
+      placeholder="e.g. Naval Base Sec 1 Camp"
+      oninput="markPlanDirty()"
+    >
+
+
+    <label>Prepared By</label>
+
+    <input
+      id="createdBy"
+      placeholder="Name"
+      oninput="markPlanDirty()"
+    >
+
+
+    <label>Notes (Optional)</label>
+
+    <textarea
+      id="notes"
+      rows="2"
+    ></textarea>
+
+
+    <h3>Activities</h3>
+
+    <div id="activityContainer"></div>
+
+
+    <div class="button-row">
+
+      <button
+        class="add"
+        onclick="addActivityRow()"
+      >
+        + Add Activity
+      </button>
+
+
+      <button
+        class="calculate"
+        onclick="calculateRequirements()"
+      >
+        Calculate Requirements
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- PLANNING RESULTS -->
+  <!-- ================================================= -->
+
+  <div
+    id="resultsSection"
+    class="hidden"
+  >
+
+    <div class="summary-cards">
+
+      <div class="summary-box">
+
+        <div
+          id="totalItems"
+          class="summary-number"
+        >
+          0
+        </div>
+
+        Equipment Types
+
+      </div>
+
+
+      <div class="summary-box">
+
+        <div
+          id="sufficientItems"
+          class="summary-number good"
+        >
+          0
+        </div>
+
+        Sufficient
+
+      </div>
+
+
+      <div class="summary-box">
+
+        <div
+          id="shortfallItems"
+          class="summary-number bad"
+        >
+          0
+        </div>
+
+        Need Top Up
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Planned Requirements</h2>
+
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Item</th>
+              <th>Have</th>
+              <th>Need</th>
+              <th>Shortfall</th>
+              <th>Remaining</th>
+            </tr>
+
+          </thead>
+
+
+          <tbody id="requirementsTable">
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div
+        id="savedOrderInfo"
+        class="hidden saved-order"
+      ></div>
+
+
+      <div class="button-row">
+
+        <button
+          class="save"
+          onclick="saveOrder()"
+        >
+          Save Order
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- EXISTING ORDERS -->
+  <!-- ================================================= -->
+
+  <div class="card">
+
+    <h2>Existing Orders</h2>
+
+
+    <label>Search Order</label>
+
+    <input
+      id="orderSearch"
+      placeholder="Search Order ID or Order Name..."
+      oninput="filterOrders()"
+    >
+
+
+    <select id="existingOrderSelect">
+    </select>
+
+
+    <button
+      class="view"
+      onclick="viewSelectedOrderSummary()"
+    >
+      View Order Summary
+    </button>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- SAVED ORDER SUMMARY -->
+  <!-- ================================================= -->
+
+  <div
+    id="orderSummarySection"
+    class="card hidden"
+  >
+
+    <h2 id="orderSummaryTitle">
+      Order Summary
     </h2>
+
+
+    <div
+      id="orderMeta"
+      class="order-info"
+    ></div>
 
 
     <div class="table-wrapper">
@@ -446,16 +555,18 @@
 
           <tr>
             <th>Item</th>
-            <th>Have</th>
-            <th>Need</th>
-            <th>Shortfall</th>
-            <th>Remaining</th>
+            <th>Planned</th>
+            <th>Withdrawn</th>
+            <th>Returned</th>
+            <th>Expended</th>
+            <th>Remaining to Withdraw</th>
+            <th>Over Plan</th>
           </tr>
 
         </thead>
 
 
-        <tbody id="requirementsTable">
+        <tbody id="orderSummaryTable">
         </tbody>
 
       </table>
@@ -463,199 +574,119 @@
     </div>
 
 
-    <div
-      id="savedOrderInfo"
-      class="hidden saved-order">
+    <!-- =============================================== -->
+    <!-- WITHDRAWAL CONTROLS -->
+    <!-- =============================================== -->
+
+    <div class="withdraw-section">
+
+      <h3>Withdraw From This Order</h3>
+
+
+      <label>Person Withdrawing</label>
+
+      <input
+        id="withdrawalName"
+        placeholder="Name"
+      >
+
+
+      <div
+        id="withdrawalButtons"
+        class="button-row"
+      >
+
+        <button
+          id="withdrawAllButton"
+          class="withdraw"
+          onclick="withdrawAllRemaining(false)"
+        >
+          Withdraw All Remaining
+        </button>
+
+
+        <button
+          id="partialButton"
+          class="partial"
+          onclick="showPartialWithdrawal()"
+        >
+          Withdraw Partially
+        </button>
+
+      </div>
+
+
+      <div
+        id="fullyWithdrawnMessage"
+        class="fully-withdrawn hidden"
+      >
+        ✓ All planned items for this Order have already been withdrawn.
+      </div>
+
+
+      <!-- ============================================= -->
+      <!-- PARTIAL WITHDRAWAL -->
+      <!-- ============================================= -->
+
+      <div
+        id="partialSection"
+        class="partial-box hidden"
+      >
+
+        <h3>Partial Withdrawal</h3>
+
+        <p>
+          The quantities below are pre-filled with the
+          remaining planned amounts.
+        </p>
+
+        <p>
+          Change a quantity to <strong>0</strong> if you
+          do not want to withdraw that item yet.
+        </p>
+
+
+        <div id="partialItems">
+        </div>
+
+
+        <div class="button-row">
+
+          <button
+            class="partial"
+            onclick="submitPartialWithdrawal(false)"
+          >
+            Withdraw Selected Amounts
+          </button>
+
+
+          <button
+            onclick="hidePartialWithdrawal()"
+          >
+            Cancel Partial Withdrawal
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
 
 
-    <button
-      class="save"
-      onclick="saveOrder()">
-
-      Save Order
-
-    </button>
+    <p>
+      Viewing this Order also refreshes the
+      <strong>Summary</strong> tab in Google Sheets.
+    </p>
 
   </div>
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- EXISTING ORDERS -->
-<!-- ================================================= -->
-
-<div class="card">
-
-  <h2>
-    Existing Orders
-  </h2>
-
-
-  <label>
-    Search Order
-  </label>
-
-  <input
-    id="orderSearch"
-    placeholder="Search Order ID or name..."
-    oninput="filterOrders()"
-  >
-
-
-  <select
-    id="existingOrderSelect">
-  </select>
 
 
   <button
-    class="view"
-    onclick="viewSelectedOrderSummary()">
-
-    Open Order
-
-  </button>
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- ORDER SUMMARY / WITHDRAWAL -->
-<!-- ================================================= -->
-
-<div
-  id="orderSummarySection"
-  class="card hidden">
-
-  <h2 id="orderSummaryTitle">
-    Order Summary
-  </h2>
-
-
-  <div
-    id="orderMeta"
-    class="order-info">
-  </div>
-
-
-  <div class="table-wrapper">
-
-    <table>
-
-      <thead>
-
-        <tr>
-          <th>Item</th>
-          <th>Planned</th>
-          <th>Withdrawn</th>
-          <th>Returned</th>
-          <th>Expended</th>
-          <th>Remaining to Withdraw</th>
-          <th>Over Plan</th>
-        </tr>
-
-      </thead>
-
-
-      <tbody id="orderSummaryTable">
-      </tbody>
-
-    </table>
-
-  </div>
-
-
-  <label>
-    Person Withdrawing
-  </label>
-
-  <input
-    id="withdrawalName"
-    placeholder="Name"
+    class="back"
+    onclick="location.href='index.html'"
   >
-
-
-  <div class="button-row">
-
-    <button
-      id="withdrawAllButton"
-      class="withdraw"
-      onclick="withdrawAllRemaining(false)">
-
-      Withdraw All Remaining
-
-    </button>
-
-
-    <button
-      id="partialButton"
-      class="partial"
-      onclick="showPartialWithdrawal()">
-
-      Withdraw Partially
-
-    </button>
-
-  </div>
-
-
-  <!-- PARTIAL WITHDRAWAL -->
-
-  <div
-    id="partialSection"
-    class="partial-box hidden">
-
-    <h3>
-      Partial Withdrawal
-    </h3>
-
-    <p>
-      Quantities are pre-filled with
-      the remaining planned amounts.
-      Change any quantity to 0 if you
-      do not want to withdraw it now.
-    </p>
-
-    <div id="partialItems">
-    </div>
-
-
-    <button
-      class="partial"
-      onclick="submitPartialWithdrawal(false)">
-
-      Withdraw Selected Amounts
-
-    </button>
-
-
-    <button
-      onclick="hidePartialWithdrawal()">
-
-      Cancel Partial Withdrawal
-
-    </button>
-
-  </div>
-
-
-  <p>
-    Viewing this Order also refreshes
-    the Google Sheets
-    <strong>Summary</strong> tab.
-  </p>
-
-</div>
-
-
-<button
-  class="back"
-  onclick="location.href='index.html'">
-
-  ← Back to Dashboard
-
-</button>
+    ← Back to Dashboard
+  </button>
 
 </div>
 
@@ -666,7 +697,8 @@
 
 <div
   id="warningModal"
-  class="modal-bg">
+  class="modal-bg"
+>
 
   <div class="modal">
 
@@ -675,36 +707,31 @@
     </h3>
 
 
-    <div id="stockWarnings">
-    </div>
+    <div id="stockWarnings"></div>
 
-
-    <div id="planWarnings">
-    </div>
+    <div id="planWarnings"></div>
 
 
     <p>
-      You can cancel and adjust the
-      withdrawal, or continue anyway.
+      You can cancel and adjust the withdrawal,
+      or continue anyway.
     </p>
 
 
     <div class="modal-buttons">
 
       <button
-        onclick="closeWarning()">
-
+        onclick="closeWarning()"
+      >
         Cancel
-
       </button>
 
 
       <button
         class="withdraw"
-        onclick="withdrawAnyway()">
-
+        onclick="withdrawAnyway()"
+      >
         Withdraw Anyway
-
       </button>
 
     </div>
@@ -717,7 +744,7 @@
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
+  "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
 
 
 let activityDatabase = {};
@@ -750,10 +777,7 @@ async function loadPage() {
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Could not load the Order system."
@@ -780,9 +804,7 @@ async function loadActivities() {
     await response.json();
 
 
-  if (
-    !data.success
-  ) {
+  if (!data.success) {
 
     alert(
       data.error ||
@@ -804,7 +826,7 @@ async function loadActivities() {
 
 
 // =====================================================
-// ADD ACTIVITY
+// ADD ACTIVITY ROW
 // =====================================================
 
 function addActivityRow() {
@@ -836,33 +858,29 @@ function addActivityRow() {
 
 
   Object
-    .keys(
-      activityDatabase
-    )
+    .keys(activityDatabase)
     .sort()
-    .forEach(
-      name => {
+    .forEach(name => {
 
-        const option =
-          document.createElement(
-            "option"
-          );
-
-
-        option.value =
-          name;
-
-
-        option.textContent =
-          name;
-
-
-        select.appendChild(
-          option
+      const option =
+        document.createElement(
+          "option"
         );
 
-      }
-    );
+
+      option.value =
+        name;
+
+
+      option.textContent =
+        name;
+
+
+      select.appendChild(
+        option
+      );
+
+    });
 
 
   const sets =
@@ -942,14 +960,11 @@ function addActivityRow() {
     row
   );
 
-
-  markPlanDirty();
-
 }
 
 
 // =====================================================
-// SELECTIONS
+// GET ACTIVITY SELECTIONS
 // =====================================================
 
 function getSelections() {
@@ -963,41 +978,39 @@ function getSelections() {
   const selections = [];
 
 
-  rows.forEach(
-    row => {
+  rows.forEach(row => {
 
-      const activity =
+    const activity =
+      row
+        .querySelector(
+          ".activity-select"
+        )
+        .value;
+
+
+    const sets =
+      Number(
         row
           .querySelector(
-            ".activity-select"
+            ".sets-input"
           )
-          .value;
+          .value
+      );
 
 
-      const sets =
-        Number(
-          row
-            .querySelector(
-              ".sets-input"
-            )
-            .value
-        );
+    if (
+      activity &&
+      sets > 0
+    ) {
 
-
-      if (
-        activity &&
-        sets > 0
-      ) {
-
-        selections.push({
-          activity: activity,
-          sets: sets
-        });
-
-      }
+      selections.push({
+        activity: activity,
+        sets: sets
+      });
 
     }
-  );
+
+  });
 
 
   return selections;
@@ -1036,18 +1049,14 @@ async function calculateRequirements() {
   try {
 
     const response =
-      await fetch(
-        url
-      );
+      await fetch(url);
 
 
     const data =
       await response.json();
 
 
-    if (
-      !data.success
-    ) {
+    if (!data.success) {
 
       alert(
         data.error ||
@@ -1104,10 +1113,7 @@ async function calculateRequirements() {
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Calculation failed."
@@ -1119,12 +1125,10 @@ async function calculateRequirements() {
 
 
 // =====================================================
-// REQUIREMENTS TABLE
+// RENDER PLANNING REQUIREMENTS
 // =====================================================
 
-function renderRequirements(
-  list
-) {
+function renderRequirements(list) {
 
   const table =
     document.getElementById(
@@ -1135,76 +1139,74 @@ function renderRequirements(
   table.innerHTML = "";
 
 
-  list.forEach(
-    item => {
+  list.forEach(item => {
 
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      if (
-        item.shortfall > 0
-      ) {
-
-        row.className =
-          "shortfall";
-
-      }
-
-
-      const missingText =
-        item.existsInInventory === false
-          ? " ⚠ Not in Inventory"
-          : "";
-
-
-      row.innerHTML = `
-
-        <td>
-
-          <strong>
-            ${escapeHtml(item.item)}
-          </strong>
-
-          <span class="bad">
-            ${missingText}
-          </span>
-
-        </td>
-
-        <td>
-          ${item.have}
-        </td>
-
-        <td>
-          ${item.need}
-        </td>
-
-        <td class="${item.shortfall > 0 ? "bad" : ""}">
-          ${item.shortfall}
-        </td>
-
-        <td class="${item.remaining < 0 ? "bad" : ""}">
-          ${item.remaining}
-        </td>
-
-      `;
-
-
-      table.appendChild(
-        row
+    const row =
+      document.createElement(
+        "tr"
       );
 
+
+    if (
+      item.shortfall > 0
+    ) {
+
+      row.className =
+        "shortfall";
+
     }
-  );
+
+
+    const missingText =
+      item.existsInInventory === false
+        ? " ⚠ Not in Inventory"
+        : "";
+
+
+    row.innerHTML = `
+
+      <td>
+
+        <strong>
+          ${escapeHtml(item.item)}
+        </strong>
+
+        <span class="bad">
+          ${missingText}
+        </span>
+
+      </td>
+
+      <td>
+        ${item.have}
+      </td>
+
+      <td>
+        ${item.need}
+      </td>
+
+      <td class="${item.shortfall > 0 ? "bad" : ""}">
+        ${item.shortfall}
+      </td>
+
+      <td class="${item.remaining < 0 ? "bad" : ""}">
+        ${item.remaining}
+      </td>
+
+    `;
+
+
+    table.appendChild(
+      row
+    );
+
+  });
 
 }
 
 
 // =====================================================
-// PLAN CHANGED
+// MARK PLAN AS CHANGED
 // =====================================================
 
 function markPlanDirty() {
@@ -1213,7 +1215,8 @@ function markPlanDirty() {
     currentOrderId
   ) {
 
-    currentOrderId = "";
+    currentOrderId =
+      "";
 
 
     document
@@ -1245,18 +1248,19 @@ async function saveOrder() {
       .trim();
 
 
-  // Warn about same Order Name.
-  // Case insensitive, but still allow it.
-
   const existingSameName =
-    orders.find(
-      order =>
-        order.orderName
-          .trim()
-          .toLowerCase()
-        ===
-        orderName
-          .toLowerCase()
+    orders.find(order =>
+
+      order.orderName
+        .trim()
+        .toLowerCase()
+
+      ===
+
+      orderName
+        .trim()
+        .toLowerCase()
+
     );
 
 
@@ -1267,16 +1271,18 @@ async function saveOrder() {
 
     const proceed =
       confirm(
+
         `An existing Order already has this name:\n\n` +
         `${existingSameName.orderId} — ${existingSameName.orderName}\n\n` +
         `Create another Order anyway?`
+
       );
 
 
-    if (
-      !proceed
-    ) {
+    if (!proceed) {
+
       return;
+
     }
 
   }
@@ -1286,10 +1292,10 @@ async function saveOrder() {
     await saveOrderInternal();
 
 
-  if (
-    !orderId
-  ) {
+  if (!orderId) {
+
     return;
+
   }
 
 
@@ -1300,6 +1306,10 @@ async function saveOrder() {
 
   await loadOrders();
 
+
+  // IMPORTANT:
+  // Open the saved Order immediately.
+  // This is where the withdrawal buttons appear.
 
   await viewOrderSummary(
     orderId
@@ -1400,18 +1410,14 @@ async function saveOrderInternal() {
   try {
 
     const response =
-      await fetch(
-        url
-      );
+      await fetch(url);
 
 
     const data =
       await response.json();
 
 
-    if (
-      !data.success
-    ) {
+    if (!data.success) {
 
       alert(
         data.error ||
@@ -1448,10 +1454,7 @@ async function saveOrderInternal() {
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Could not save Order."
@@ -1466,7 +1469,7 @@ async function saveOrderInternal() {
 
 
 // =====================================================
-// LOAD ORDERS
+// LOAD SAVED ORDERS
 // =====================================================
 
 async function loadOrders() {
@@ -1481,10 +1484,10 @@ async function loadOrders() {
     await response.json();
 
 
-  if (
-    !data.success
-  ) {
+  if (!data.success) {
+
     return;
+
   }
 
 
@@ -1500,12 +1503,10 @@ async function loadOrders() {
 
 
 // =====================================================
-// RENDER ORDER SELECTOR
+// RENDER ORDER DROPDOWN
 // =====================================================
 
-function renderOrders(
-  list
-) {
+function renderOrders(list) {
 
   const select =
     document.getElementById(
@@ -1517,40 +1518,37 @@ function renderOrders(
     select.value;
 
 
-  select.innerHTML = "";
+  select.innerHTML =
+    "";
 
 
-  list.forEach(
-    order => {
+  list.forEach(order => {
 
-      const option =
-        document.createElement(
-          "option"
-        );
-
-
-      option.value =
-        order.orderId;
-
-
-      option.textContent =
-        `${order.orderId} — ${order.orderName}`;
-
-
-      select.appendChild(
-        option
+    const option =
+      document.createElement(
+        "option"
       );
 
-    }
-  );
+
+    option.value =
+      order.orderId;
+
+
+    option.textContent =
+      `${order.orderId} — ${order.orderName}`;
+
+
+    select.appendChild(
+      option
+    );
+
+  });
 
 
   if (
     [...select.options]
-      .some(
-        option =>
-          option.value ===
-          current
+      .some(option =>
+        option.value === current
       )
   ) {
 
@@ -1563,7 +1561,7 @@ function renderOrders(
 
 
 // =====================================================
-// ORDER SEARCH
+// FILTER ORDERS
 // =====================================================
 
 function filterOrders() {
@@ -1579,24 +1577,18 @@ function filterOrders() {
 
 
   const filtered =
-    orders.filter(
-      order => {
+    orders.filter(order =>
 
-        return (
-          order.orderId
-            .toLowerCase()
-            .includes(
-              search
-            )
-          ||
-          order.orderName
-            .toLowerCase()
-            .includes(
-              search
-            )
-        );
+      order.orderId
+        .toLowerCase()
+        .includes(search)
 
-      }
+      ||
+
+      order.orderName
+        .toLowerCase()
+        .includes(search)
+
     );
 
 
@@ -1608,7 +1600,7 @@ function filterOrders() {
 
 
 // =====================================================
-// OPEN SELECTED ORDER
+// VIEW SELECTED SAVED ORDER
 // =====================================================
 
 async function viewSelectedOrderSummary() {
@@ -1643,17 +1635,17 @@ async function viewSelectedOrderSummary() {
 // VIEW ORDER SUMMARY
 // =====================================================
 
-async function viewOrderSummary(
-  orderId
-) {
+async function viewOrderSummary(orderId) {
 
   try {
 
     const response =
       await fetch(
+
         `${API_URL}?action=getOrderSummary` +
         `&orderId=${encodeURIComponent(orderId)}` +
         `&write=1`
+
       );
 
 
@@ -1661,9 +1653,7 @@ async function viewOrderSummary(
       await response.json();
 
 
-    if (
-      !data.success
-    ) {
+    if (!data.success) {
 
       alert(
         data.error ||
@@ -1728,77 +1718,73 @@ async function viewOrderSummary(
       );
 
 
-    table.innerHTML = "";
+    table.innerHTML =
+      "";
 
 
-    data.items.forEach(
-      item => {
+    data.items.forEach(item => {
 
-        const row =
-          document.createElement(
-            "tr"
-          );
-
-
-        if (
-          item.remainingToWithdraw === 0
-        ) {
-
-          row.classList
-            .add(
-              "complete"
-            );
-
-        }
-
-
-        row.innerHTML = `
-
-          <td>
-            <strong>
-              ${escapeHtml(item.item)}
-            </strong>
-          </td>
-
-          <td>
-            ${item.planned}
-          </td>
-
-          <td>
-            ${item.withdrawn}
-          </td>
-
-          <td>
-            ${item.returned}
-          </td>
-
-          <td>
-            ${item.expended}
-          </td>
-
-          <td>
-            <strong>
-              ${item.remainingToWithdraw}
-            </strong>
-          </td>
-
-          <td class="${item.overPlan > 0 ? "bad" : ""}">
-            ${item.overPlan}
-          </td>
-
-        `;
-
-
-        table.appendChild(
-          row
+      const row =
+        document.createElement(
+          "tr"
         );
 
+
+      if (
+        item.remainingToWithdraw === 0
+      ) {
+
+        row.classList
+          .add(
+            "complete"
+          );
+
       }
-    );
 
 
-    // Pre-fill withdrawal name
-    // with creator only if blank.
+      row.innerHTML = `
+
+        <td>
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+        </td>
+
+        <td>
+          ${item.planned}
+        </td>
+
+        <td>
+          ${item.withdrawn}
+        </td>
+
+        <td>
+          ${item.returned}
+        </td>
+
+        <td>
+          ${item.expended}
+        </td>
+
+        <td>
+          <strong>
+            ${item.remainingToWithdraw}
+          </strong>
+        </td>
+
+        <td class="${item.overPlan > 0 ? "bad" : ""}">
+          ${item.overPlan}
+        </td>
+
+      `;
+
+
+      table.appendChild(
+        row
+      );
+
+    });
+
 
     const withdrawalName =
       document.getElementById(
@@ -1849,17 +1835,13 @@ async function viewOrderSummary(
         "orderSummarySection"
       )
       .scrollIntoView({
-        behavior:
-          "smooth"
+        behavior: "smooth"
       });
 
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Could not load Order."
@@ -1871,12 +1853,24 @@ async function viewOrderSummary(
 
 
 // =====================================================
-// WITHDRAWAL BUTTON STATE
+// SHOW/HIDE WITHDRAW BUTTONS
 // =====================================================
 
 function updateWithdrawalButtons(
   hasRemaining
 ) {
+
+  const buttonContainer =
+    document.getElementById(
+      "withdrawalButtons"
+    );
+
+
+  const completedMessage =
+    document.getElementById(
+      "fullyWithdrawnMessage"
+    );
+
 
   const allButton =
     document.getElementById(
@@ -1890,9 +1884,21 @@ function updateWithdrawalButtons(
     );
 
 
-  if (
-    hasRemaining
-  ) {
+  if (hasRemaining) {
+
+    buttonContainer
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    completedMessage
+      .classList
+      .add(
+        "hidden"
+      );
+
 
     allButton.disabled =
       false;
@@ -1905,18 +1911,21 @@ function updateWithdrawalButtons(
     allButton.textContent =
       "Withdraw All Remaining";
 
+
   } else {
 
-    allButton.disabled =
-      true;
+    buttonContainer
+      .classList
+      .add(
+        "hidden"
+      );
 
 
-    partialButton.disabled =
-      true;
-
-
-    allButton.textContent =
-      "Planned Items Fully Withdrawn";
+    completedMessage
+      .classList
+      .remove(
+        "hidden"
+      );
 
   }
 
@@ -1976,8 +1985,7 @@ async function withdrawAllRemaining(
 
 
   await processOrderWithdrawal(
-    url,
-    force
+    url
   );
 
 }
@@ -1992,7 +2000,13 @@ function showPartialWithdrawal() {
   if (
     !currentOrderSummary
   ) {
+
+    alert(
+      "Open an Order first."
+    );
+
     return;
+
   }
 
 
@@ -2012,7 +2026,7 @@ function showPartialWithdrawal() {
 
 
 // =====================================================
-// HIDE PARTIAL
+// HIDE PARTIAL WITHDRAWAL
 // =====================================================
 
 function hidePartialWithdrawal() {
@@ -2030,7 +2044,7 @@ function hidePartialWithdrawal() {
 
 
 // =====================================================
-// RENDER PARTIAL ITEMS
+// RENDER PARTIAL WITHDRAWAL ITEMS
 // =====================================================
 
 function renderPartialItems() {
@@ -2041,88 +2055,92 @@ function renderPartialItems() {
     );
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   if (
     !currentOrderSummary
   ) {
+
     return;
+
   }
 
 
   currentOrderSummary
     .items
-    .forEach(
-      item => {
-
-        if (
-          item.remainingToWithdraw <= 0
-        ) {
-          return;
-        }
+    .forEach(item => {
 
 
-        const row =
-          document.createElement(
-            "div"
-          );
+      if (
+        item.remainingToWithdraw <= 0
+      ) {
 
-
-        row.className =
-          "partial-row";
-
-
-        row.innerHTML = `
-
-          <div>
-
-            <strong>
-              ${escapeHtml(item.item)}
-            </strong>
-
-            <br>
-
-            Planned:
-            ${item.planned}
-
-            &nbsp;|&nbsp;
-
-            Withdrawn:
-            ${item.withdrawn}
-
-            &nbsp;|&nbsp;
-
-            Remaining:
-            ${item.remainingToWithdraw}
-
-          </div>
-
-
-          <input
-            type="number"
-            step="any"
-            min="0"
-            class="partialQty"
-            data-item="${escapeHtml(item.item)}"
-            value="${item.remainingToWithdraw}"
-          >
-
-        `;
-
-
-        container.appendChild(
-          row
-        );
+        return;
 
       }
-    );
+
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+
+      row.className =
+        "partial-row";
+
+
+      row.innerHTML = `
+
+        <div>
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Planned:
+          ${item.planned}
+
+          &nbsp;|&nbsp;
+
+          Withdrawn:
+          ${item.withdrawn}
+
+          &nbsp;|&nbsp;
+
+          Remaining:
+          ${item.remainingToWithdraw}
+
+        </div>
+
+
+        <input
+          type="number"
+          step="any"
+          min="0"
+          class="partialQty"
+          data-item="${escapeHtml(item.item)}"
+          value="${item.remainingToWithdraw}"
+        >
+
+      `;
+
+
+      container.appendChild(
+        row
+      );
+
+    });
 
 }
 
 
 // =====================================================
-// GET PARTIAL ITEMS
+// GET PARTIAL WITHDRAWAL ITEMS
 // =====================================================
 
 function getPartialItems() {
@@ -2133,36 +2151,35 @@ function getPartialItems() {
     );
 
 
-  const items = [];
+  const items =
+    [];
 
 
-  inputs.forEach(
-    input => {
+  inputs.forEach(input => {
 
-      const qty =
-        Number(
-          input.value
-        );
-
-
-      const item =
-        input.dataset.item;
+    const qty =
+      Number(
+        input.value
+      );
 
 
-      if (
-        item &&
-        qty > 0
-      ) {
+    const item =
+      input.dataset.item;
 
-        items.push({
-          item: item,
-          qty: qty
-        });
 
-      }
+    if (
+      item &&
+      qty > 0
+    ) {
+
+      items.push({
+        item: item,
+        qty: qty
+      });
 
     }
-  );
+
+  });
 
 
   return items;
@@ -2241,8 +2258,7 @@ async function submitPartialWithdrawal(
 
 
   await processOrderWithdrawal(
-    url,
-    force
+    url
   );
 
 }
@@ -2253,16 +2269,13 @@ async function submitPartialWithdrawal(
 // =====================================================
 
 async function processOrderWithdrawal(
-  url,
-  force
+  url
 ) {
 
   try {
 
     const response =
-      await fetch(
-        url
-      );
+      await fetch(url);
 
 
     const data =
@@ -2315,10 +2328,7 @@ async function processOrderWithdrawal(
 
   } catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Withdrawal failed."
@@ -2350,10 +2360,15 @@ function showWarning(
     );
 
 
-  stockContainer.innerHTML = "";
+  stockContainer.innerHTML =
+    "";
 
-  planContainer.innerHTML = "";
 
+  planContainer.innerHTML =
+    "";
+
+
+  // STOCK SHORTFALLS
 
   if (
     shortages.length > 0
@@ -2363,59 +2378,59 @@ function showWarning(
       `<h4>Stock Shortfall</h4>`;
 
 
-    shortages.forEach(
-      item => {
+    shortages.forEach(item => {
 
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "warning-box";
-
-
-        div.innerHTML = `
-
-          <strong>
-            ${escapeHtml(item.item)}
-          </strong>
-
-          <br>
-
-          Available:
-          ${item.available}
-
-          <br>
-
-          Requested:
-          ${item.requested}
-
-          <br>
-
-          <strong>
-            Shortfall:
-            ${item.shortfall}
-          </strong>
-
-          <br>
-
-          Stock after withdrawal:
-          ${item.newQty}
-
-        `;
-
-
-        stockContainer.appendChild(
-          div
+      const div =
+        document.createElement(
+          "div"
         );
 
-      }
-    );
+
+      div.className =
+        "warning-box";
+
+
+      div.innerHTML = `
+
+        <strong>
+          ${escapeHtml(item.item)}
+        </strong>
+
+        <br>
+
+        Available:
+        ${item.available}
+
+        <br>
+
+        Requested:
+        ${item.requested}
+
+        <br>
+
+        <strong>
+          Shortfall:
+          ${item.shortfall}
+        </strong>
+
+        <br>
+
+        Stock after withdrawal:
+        ${item.newQty}
+
+      `;
+
+
+      stockContainer.appendChild(
+        div
+      );
+
+    });
 
   }
 
+
+  // ORDER PLAN EXCESS
 
   if (
     planExcesses.length > 0
@@ -2425,61 +2440,59 @@ function showWarning(
       `<h4>Order Plan Exceeded</h4>`;
 
 
-    planExcesses.forEach(
-      item => {
+    planExcesses.forEach(item => {
 
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "plan-box";
-
-
-        div.innerHTML = `
-
-          <strong>
-            ${escapeHtml(item.item)}
-          </strong>
-
-          <br>
-
-          Planned:
-          ${item.planned}
-
-          <br>
-
-          Already withdrawn:
-          ${item.withdrawnSoFar}
-
-          <br>
-
-          Remaining planned:
-          ${item.remainingPlanned}
-
-          <br>
-
-          Requested now:
-          ${item.requested}
-
-          <br>
-
-          <strong>
-            Exceeds plan by:
-            ${item.exceedsBy}
-          </strong>
-
-        `;
-
-
-        planContainer.appendChild(
-          div
+      const div =
+        document.createElement(
+          "div"
         );
 
-      }
-    );
+
+      div.className =
+        "plan-box";
+
+
+      div.innerHTML = `
+
+        <strong>
+          ${escapeHtml(item.item)}
+        </strong>
+
+        <br>
+
+        Planned:
+        ${item.planned}
+
+        <br>
+
+        Already withdrawn:
+        ${item.withdrawnSoFar}
+
+        <br>
+
+        Remaining planned:
+        ${item.remainingPlanned}
+
+        <br>
+
+        Requested now:
+        ${item.requested}
+
+        <br>
+
+        <strong>
+          Exceeds plan by:
+          ${item.exceedsBy}
+        </strong>
+
+      `;
+
+
+      planContainer.appendChild(
+        div
+      );
+
+    });
 
   }
 
@@ -2548,16 +2561,12 @@ async function withdrawAnyway() {
 
 
 // =====================================================
-// HTML SAFETY
+// ESCAPE HTML
 // =====================================================
 
-function escapeHtml(
-  value
-) {
+function escapeHtml(value) {
 
-  return String(
-    value
-  )
+  return String(value)
     .replaceAll(
       "&",
       "&amp;"
@@ -2581,6 +2590,10 @@ function escapeHtml(
 
 }
 
+
+// =====================================================
+// START
+// =====================================================
 
 window.onload =
   loadPage;
