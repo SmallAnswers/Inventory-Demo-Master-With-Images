@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>Plan Equipment</title>
+  <title>Plan Equipment / Orders</title>
 
   <meta
     name="viewport"
@@ -10,7 +10,9 @@
 
   <style>
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -21,7 +23,7 @@
     }
 
     .container {
-      max-width: 950px;
+      max-width: 1000px;
       margin: auto;
     }
 
@@ -34,7 +36,9 @@
       padding: 20px;
       border-radius: 14px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow:
+        0 4px 12px
+        rgba(0,0,0,0.05);
     }
 
     label {
@@ -71,6 +75,11 @@
       margin-top: 10px;
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .add {
       background: #f1c40f;
     }
@@ -87,6 +96,11 @@
 
     .withdraw {
       background: #27ae60;
+      color: white;
+    }
+
+    .partial {
+      background: #16a085;
       color: white;
     }
 
@@ -139,6 +153,7 @@
 
     .bad {
       color: #e74c3c;
+      font-weight: bold;
     }
 
     .table-wrapper {
@@ -166,6 +181,10 @@
       background: #fff1f0;
     }
 
+    .complete {
+      background: #edf8ef;
+    }
+
     .hidden {
       display: none;
     }
@@ -178,6 +197,32 @@
       font-weight: bold;
     }
 
+    .order-info {
+      background: #f7f7f7;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .partial-box {
+      border:
+        1px solid #ddd;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .partial-row {
+      display: grid;
+      grid-template-columns:
+        1fr 120px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom:
+        1px solid #eee;
+    }
+
     .modal-bg {
       display: none;
       position: fixed;
@@ -187,14 +232,31 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      z-index: 1000;
     }
 
     .modal {
       background: white;
       width: 100%;
-      max-width: 450px;
+      max-width: 480px;
+      max-height: 85vh;
+      overflow-y: auto;
       border-radius: 14px;
       padding: 22px;
+    }
+
+    .warning-box {
+      padding: 10px;
+      background: #fff4f3;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .plan-box {
+      padding: 10px;
+      background: #fff9e6;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
 
     .warning {
@@ -214,7 +276,19 @@
       }
 
       .summary-cards {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+          1fr;
+      }
+
+      .partial-row {
+        grid-template-columns:
+          1fr;
+      }
+
+      th,
+      td {
+        font-size: 12px;
+        padding: 8px;
       }
 
     }
@@ -223,22 +297,28 @@
 
 </head>
 
+
 <body>
 
 <div class="container">
 
-<h1>Equipment Planning</h1>
+<h1>
+  Equipment Planning / Orders
+</h1>
 
 
 <!-- ================================================= -->
-<!-- CREATE ORDER -->
+<!-- CREATE NEW ORDER -->
 <!-- ================================================= -->
 
 <div class="card">
 
   <h2>Create New Order</h2>
 
-  <label>Order Name</label>
+
+  <label>
+    Order Name
+  </label>
 
   <input
     id="orderName"
@@ -247,15 +327,20 @@
   >
 
 
-  <label>Prepared By</label>
+  <label>
+    Prepared By
+  </label>
 
   <input
     id="createdBy"
+    placeholder="Name"
     oninput="markPlanDirty()"
   >
 
 
-  <label>Notes (Optional)</label>
+  <label>
+    Notes (Optional)
+  </label>
 
   <textarea
     id="notes"
@@ -263,9 +348,12 @@
   </textarea>
 
 
-  <h3>Activities</h3>
+  <h3>
+    Activities
+  </h3>
 
-  <div id="activityContainer"></div>
+  <div id="activityContainer">
+  </div>
 
 
   <div class="button-row">
@@ -273,13 +361,18 @@
     <button
       class="add"
       onclick="addActivityRow()">
+
       + Add Activity
+
     </button>
+
 
     <button
       class="calculate"
       onclick="calculateRequirements()">
+
       Calculate Requirements
+
     </button>
 
   </div>
@@ -288,7 +381,7 @@
 
 
 <!-- ================================================= -->
-<!-- CALCULATION -->
+<!-- PLANNING RESULT -->
 <!-- ================================================= -->
 
 <div
@@ -298,30 +391,41 @@
   <div class="summary-cards">
 
     <div class="summary-box">
+
       <div
         id="totalItems"
         class="summary-number">
         0
       </div>
+
       Equipment Types
+
     </div>
 
+
     <div class="summary-box">
+
       <div
         id="sufficientItems"
         class="summary-number good">
         0
       </div>
+
       Sufficient
+
     </div>
 
+
     <div class="summary-box">
+
       <div
         id="shortfallItems"
         class="summary-number bad">
         0
       </div>
+
       Need Top Up
+
     </div>
 
   </div>
@@ -329,11 +433,17 @@
 
   <div class="card">
 
+    <h2>
+      Planned Requirements
+    </h2>
+
+
     <div class="table-wrapper">
 
       <table>
 
         <thead>
+
           <tr>
             <th>Item</th>
             <th>Have</th>
@@ -341,7 +451,9 @@
             <th>Shortfall</th>
             <th>Remaining</th>
           </tr>
+
         </thead>
+
 
         <tbody id="requirementsTable">
         </tbody>
@@ -357,28 +469,13 @@
     </div>
 
 
-    <div class="button-row">
+    <button
+      class="save"
+      onclick="saveOrder()">
 
-      <button
-        class="save"
-        onclick="saveOrder()">
-        Save Order
-      </button>
+      Save Order
 
-      <button
-        class="withdraw"
-        onclick="withdrawCurrentOrder(false)">
-        Withdraw Full Order
-      </button>
-
-      <button
-        id="viewCurrentButton"
-        class="view hidden"
-        onclick="viewCurrentOrderSummary()">
-        View Saved Order Summary
-      </button>
-
-    </div>
+    </button>
 
   </div>
 
@@ -391,32 +488,40 @@
 
 <div class="card">
 
-  <h2>Existing Orders</h2>
+  <h2>
+    Existing Orders
+  </h2>
 
-  <label>Search Order</label>
+
+  <label>
+    Search Order
+  </label>
 
   <input
     id="orderSearch"
-    placeholder="Search by Order ID or name..."
+    placeholder="Search Order ID or name..."
     oninput="filterOrders()"
   >
 
 
-  <select id="existingOrderSelect">
+  <select
+    id="existingOrderSelect">
   </select>
 
 
   <button
     class="view"
     onclick="viewSelectedOrderSummary()">
-    View Order Summary
+
+    Open Order
+
   </button>
 
 </div>
 
 
 <!-- ================================================= -->
-<!-- ORDER SUMMARY -->
+<!-- ORDER SUMMARY / WITHDRAWAL -->
 <!-- ================================================= -->
 
 <div
@@ -427,21 +532,31 @@
     Order Summary
   </h2>
 
-  <div id="orderMeta"></div>
+
+  <div
+    id="orderMeta"
+    class="order-info">
+  </div>
+
 
   <div class="table-wrapper">
 
     <table>
 
       <thead>
+
         <tr>
           <th>Item</th>
           <th>Planned</th>
           <th>Withdrawn</th>
           <th>Returned</th>
           <th>Expended</th>
+          <th>Remaining to Withdraw</th>
+          <th>Over Plan</th>
         </tr>
+
       </thead>
+
 
       <tbody id="orderSummaryTable">
       </tbody>
@@ -450,9 +565,84 @@
 
   </div>
 
+
+  <label>
+    Person Withdrawing
+  </label>
+
+  <input
+    id="withdrawalName"
+    placeholder="Name"
+  >
+
+
+  <div class="button-row">
+
+    <button
+      id="withdrawAllButton"
+      class="withdraw"
+      onclick="withdrawAllRemaining(false)">
+
+      Withdraw All Remaining
+
+    </button>
+
+
+    <button
+      id="partialButton"
+      class="partial"
+      onclick="showPartialWithdrawal()">
+
+      Withdraw Partially
+
+    </button>
+
+  </div>
+
+
+  <!-- PARTIAL WITHDRAWAL -->
+
+  <div
+    id="partialSection"
+    class="partial-box hidden">
+
+    <h3>
+      Partial Withdrawal
+    </h3>
+
+    <p>
+      Quantities are pre-filled with
+      the remaining planned amounts.
+      Change any quantity to 0 if you
+      do not want to withdraw it now.
+    </p>
+
+    <div id="partialItems">
+    </div>
+
+
+    <button
+      class="partial"
+      onclick="submitPartialWithdrawal(false)">
+
+      Withdraw Selected Amounts
+
+    </button>
+
+
+    <button
+      onclick="hidePartialWithdrawal()">
+
+      Cancel Partial Withdrawal
+
+    </button>
+
+  </div>
+
+
   <p>
-    This summary has also been written
-    to the Google Sheets
+    Viewing this Order also refreshes
+    the Google Sheets
     <strong>Summary</strong> tab.
   </p>
 
@@ -462,7 +652,9 @@
 <button
   class="back"
   onclick="location.href='index.html'">
+
   ← Back to Dashboard
+
 </button>
 
 </div>
@@ -479,27 +671,40 @@
   <div class="modal">
 
     <h3 class="warning">
-      ⚠️ Insufficient Stock
+      ⚠️ Withdrawal Warning
     </h3>
 
-    <div id="warningContent"></div>
+
+    <div id="stockWarnings">
+    </div>
+
+
+    <div id="planWarnings">
+    </div>
+
 
     <p>
-      Continuing will allow the affected
-      inventory quantities to become negative.
+      You can cancel and adjust the
+      withdrawal, or continue anyway.
     </p>
+
 
     <div class="modal-buttons">
 
       <button
         onclick="closeWarning()">
+
         Cancel
+
       </button>
+
 
       <button
         class="withdraw"
         onclick="withdrawAnyway()">
+
         Withdraw Anyway
+
       </button>
 
     </div>
@@ -514,28 +719,53 @@
 const API_URL =
 "https://script.google.com/macros/s/AKfycbxxaf_a6UciSY1J-Q1iPH9iwZshM1bmoRTEvXvVAsjFQvyCypnj6Knb-5yEadz7dQHO/exec";
 
+
 let activityDatabase = {};
+
 let orders = [];
+
 let currentOrderId = "";
+
+let currentViewedOrderId = "";
+
+let currentOrderSummary = null;
+
 let currentRequirements = [];
+
+let pendingWithdrawalMode = "";
 
 
 // =====================================================
-// LOAD
+// LOAD PAGE
 // =====================================================
 
 async function loadPage() {
 
-  await Promise.all([
-    loadActivities(),
-    loadOrders()
-  ]);
+  try {
+
+    await Promise.all([
+      loadActivities(),
+      loadOrders()
+    ]);
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Could not load the Order system."
+    );
+
+  }
 
 }
 
 
 // =====================================================
-// ACTIVITIES
+// LOAD ACTIVITIES
 // =====================================================
 
 async function loadActivities() {
@@ -550,7 +780,9 @@ async function loadActivities() {
     await response.json();
 
 
-  if (!data.success) {
+  if (
+    !data.success
+  ) {
 
     alert(
       data.error ||
@@ -558,6 +790,7 @@ async function loadActivities() {
     );
 
     return;
+
   }
 
 
@@ -570,6 +803,10 @@ async function loadActivities() {
 }
 
 
+// =====================================================
+// ADD ACTIVITY
+// =====================================================
+
 function addActivityRow() {
 
   const container =
@@ -579,7 +816,9 @@ function addActivityRow() {
 
 
   const row =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
 
   row.className =
@@ -587,48 +826,80 @@ function addActivityRow() {
 
 
   const select =
-    document.createElement("select");
+    document.createElement(
+      "select"
+    );
 
 
   select.className =
     "activity-select";
 
 
-  Object.keys(activityDatabase)
+  Object
+    .keys(
+      activityDatabase
+    )
     .sort()
-    .forEach(name => {
+    .forEach(
+      name => {
 
-      const option =
-        document.createElement(
-          "option"
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          name;
+
+
+        option.textContent =
+          name;
+
+
+        select.appendChild(
+          option
         );
 
-      option.value = name;
-      option.textContent = name;
-
-      select.appendChild(
-        option
-      );
-
-    });
+      }
+    );
 
 
   const sets =
-    document.createElement("input");
+    document.createElement(
+      "input"
+    );
 
-  sets.type = "number";
-  sets.step = "any";
-  sets.min = "0";
-  sets.value = "1";
+
+  sets.type =
+    "number";
+
+
+  sets.step =
+    "any";
+
+
+  sets.min =
+    "0";
+
+
+  sets.value =
+    "1";
+
+
   sets.className =
     "sets-input";
 
 
   const remove =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
+
 
   remove.className =
     "remove";
+
 
   remove.textContent =
     "✕";
@@ -652,14 +923,24 @@ function addActivityRow() {
     markPlanDirty;
 
 
-  row.appendChild(select);
-
-  row.appendChild(sets);
-
-  row.appendChild(remove);
+  row.appendChild(
+    select
+  );
 
 
-  container.appendChild(row);
+  row.appendChild(
+    sets
+  );
+
+
+  row.appendChild(
+    remove
+  );
+
+
+  container.appendChild(
+    row
+  );
 
 
   markPlanDirty();
@@ -682,35 +963,41 @@ function getSelections() {
   const selections = [];
 
 
-  rows.forEach(row => {
+  rows.forEach(
+    row => {
 
-    const activity =
-      row.querySelector(
-        ".activity-select"
-      ).value;
-
-
-    const sets =
-      Number(
-        row.querySelector(
-          ".sets-input"
-        ).value
-      );
+      const activity =
+        row
+          .querySelector(
+            ".activity-select"
+          )
+          .value;
 
 
-    if (
-      activity &&
-      sets > 0
-    ) {
+      const sets =
+        Number(
+          row
+            .querySelector(
+              ".sets-input"
+            )
+            .value
+        );
 
-      selections.push({
-        activity: activity,
-        sets: sets
-      });
+
+      if (
+        activity &&
+        sets > 0
+      ) {
+
+        selections.push({
+          activity: activity,
+          sets: sets
+        });
+
+      }
 
     }
-
-  });
+  );
 
 
   return selections;
@@ -719,7 +1006,7 @@ function getSelections() {
 
 
 // =====================================================
-// CALCULATE
+// CALCULATE REQUIREMENTS
 // =====================================================
 
 async function calculateRequirements() {
@@ -746,64 +1033,87 @@ async function calculateRequirements() {
     `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
 
 
-  const response =
-    await fetch(url);
+  try {
+
+    const response =
+      await fetch(
+        url
+      );
 
 
-  const data =
-    await response.json();
+    const data =
+      await response.json();
 
 
-  if (!data.success) {
+    if (
+      !data.success
+    ) {
+
+      alert(
+        data.error ||
+        "Calculation failed."
+      );
+
+      return;
+
+    }
+
+
+    currentRequirements =
+      data.requirements || [];
+
+
+    document
+      .getElementById(
+        "totalItems"
+      )
+      .textContent =
+        data.totalItems || 0;
+
+
+    document
+      .getElementById(
+        "sufficientItems"
+      )
+      .textContent =
+        data.sufficientItems || 0;
+
+
+    document
+      .getElementById(
+        "shortfallItems"
+      )
+      .textContent =
+        data.shortfallItems || 0;
+
+
+    renderRequirements(
+      currentRequirements
+    );
+
+
+    document
+      .getElementById(
+        "resultsSection"
+      )
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
 
     alert(
-      data.error ||
       "Calculation failed."
     );
 
-    return;
   }
-
-
-  currentRequirements =
-    data.requirements || [];
-
-
-  document
-    .getElementById(
-      "totalItems"
-    )
-    .textContent =
-      data.totalItems || 0;
-
-
-  document
-    .getElementById(
-      "sufficientItems"
-    )
-    .textContent =
-      data.sufficientItems || 0;
-
-
-  document
-    .getElementById(
-      "shortfallItems"
-    )
-    .textContent =
-      data.shortfallItems || 0;
-
-
-  renderRequirements(
-    currentRequirements
-  );
-
-
-  document
-    .getElementById(
-      "resultsSection"
-    )
-    .classList
-    .remove("hidden");
 
 }
 
@@ -812,7 +1122,9 @@ async function calculateRequirements() {
 // REQUIREMENTS TABLE
 // =====================================================
 
-function renderRequirements(list) {
+function renderRequirements(
+  list
+) {
 
   const table =
     document.getElementById(
@@ -823,44 +1135,70 @@ function renderRequirements(list) {
   table.innerHTML = "";
 
 
-  list.forEach(item => {
+  list.forEach(
+    item => {
 
-    const row =
-      document.createElement("tr");
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-    if (
-      item.shortfall > 0
-    ) {
-      row.className =
-        "shortfall";
+      if (
+        item.shortfall > 0
+      ) {
+
+        row.className =
+          "shortfall";
+
+      }
+
+
+      const missingText =
+        item.existsInInventory === false
+          ? " ⚠ Not in Inventory"
+          : "";
+
+
+      row.innerHTML = `
+
+        <td>
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <span class="bad">
+            ${missingText}
+          </span>
+
+        </td>
+
+        <td>
+          ${item.have}
+        </td>
+
+        <td>
+          ${item.need}
+        </td>
+
+        <td class="${item.shortfall > 0 ? "bad" : ""}">
+          ${item.shortfall}
+        </td>
+
+        <td class="${item.remaining < 0 ? "bad" : ""}">
+          ${item.remaining}
+        </td>
+
+      `;
+
+
+      table.appendChild(
+        row
+      );
+
     }
-
-
-    row.innerHTML = `
-
-      <td>
-        <strong>${escapeHtml(item.item)}</strong>
-      </td>
-
-      <td>${item.have}</td>
-
-      <td>${item.need}</td>
-
-      <td class="${item.shortfall > 0 ? "bad" : ""}">
-        ${item.shortfall}
-      </td>
-
-      <td class="${item.remaining < 0 ? "bad" : ""}">
-        ${item.remaining}
-      </td>
-
-    `;
-
-
-    table.appendChild(row);
-
-  });
+  );
 
 }
 
@@ -871,7 +1209,9 @@ function renderRequirements(list) {
 
 function markPlanDirty() {
 
-  if (currentOrderId) {
+  if (
+    currentOrderId
+  ) {
 
     currentOrderId = "";
 
@@ -881,15 +1221,9 @@ function markPlanDirty() {
         "savedOrderInfo"
       )
       .classList
-      .add("hidden");
-
-
-    document
-      .getElementById(
-        "viewCurrentButton"
-      )
-      .classList
-      .add("hidden");
+      .add(
+        "hidden"
+      );
 
   }
 
@@ -902,26 +1236,87 @@ function markPlanDirty() {
 
 async function saveOrder() {
 
-  const result =
-    await saveOrderInternal(true);
+  const orderName =
+    document
+      .getElementById(
+        "orderName"
+      )
+      .value
+      .trim();
 
 
-  if (result) {
+  // Warn about same Order Name.
+  // Case insensitive, but still allow it.
 
-    alert(
-      `Order saved as ${result}`
+  const existingSameName =
+    orders.find(
+      order =>
+        order.orderName
+          .trim()
+          .toLowerCase()
+        ===
+        orderName
+          .toLowerCase()
     );
 
+
+  if (
+    existingSameName &&
+    !currentOrderId
+  ) {
+
+    const proceed =
+      confirm(
+        `An existing Order already has this name:\n\n` +
+        `${existingSameName.orderId} — ${existingSameName.orderName}\n\n` +
+        `Create another Order anyway?`
+      );
+
+
+    if (
+      !proceed
+    ) {
+      return;
+    }
+
   }
+
+
+  const orderId =
+    await saveOrderInternal();
+
+
+  if (
+    !orderId
+  ) {
+    return;
+  }
+
+
+  alert(
+    `Order saved as ${orderId}`
+  );
+
+
+  await loadOrders();
+
+
+  await viewOrderSummary(
+    orderId
+  );
 
 }
 
 
-async function saveOrderInternal(
-  reloadOrders
-) {
+// =====================================================
+// SAVE ORDER INTERNAL
+// =====================================================
 
-  if (currentOrderId) {
+async function saveOrderInternal() {
+
+  if (
+    currentOrderId
+  ) {
 
     return currentOrderId;
 
@@ -1002,216 +1397,76 @@ async function saveOrderInternal(
     `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
 
 
-  const response =
-    await fetch(url);
+  try {
+
+    const response =
+      await fetch(
+        url
+      );
 
 
-  const data =
-    await response.json();
+    const data =
+      await response.json();
 
 
-  if (!data.success) {
+    if (
+      !data.success
+    ) {
+
+      alert(
+        data.error ||
+        "Could not save Order."
+      );
+
+      return null;
+
+    }
+
+
+    currentOrderId =
+      data.orderId;
+
+
+    const info =
+      document.getElementById(
+        "savedOrderInfo"
+      );
+
+
+    info.textContent =
+      `Saved as ${data.orderId} — ${data.orderName}`;
+
+
+    info.classList
+      .remove(
+        "hidden"
+      );
+
+
+    return currentOrderId;
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
 
     alert(
-      data.error ||
-      "Could not save order."
+      "Could not save Order."
     );
+
 
     return null;
 
   }
 
-
-  currentOrderId =
-    data.orderId;
-
-
-  const info =
-    document.getElementById(
-      "savedOrderInfo"
-    );
-
-
-  info.textContent =
-    `Saved as ${data.orderId} — ${data.orderName}`;
-
-
-  info.classList
-    .remove("hidden");
-
-
-  document
-    .getElementById(
-      "viewCurrentButton"
-    )
-    .classList
-    .remove("hidden");
-
-
-  if (reloadOrders) {
-
-    await loadOrders();
-
-  }
-
-
-  return currentOrderId;
-
 }
 
 
 // =====================================================
-// WITHDRAW FULL ORDER
-// =====================================================
-
-async function withdrawCurrentOrder(
-  force
-) {
-
-  let orderId =
-    currentOrderId;
-
-
-  if (!orderId) {
-
-    orderId =
-      await saveOrderInternal(
-        true
-      );
-
-  }
-
-
-  if (!orderId) {
-    return;
-  }
-
-
-  const name =
-    document
-      .getElementById(
-        "createdBy"
-      )
-      .value
-      .trim();
-
-
-  const url =
-    `${API_URL}?action=withdrawOrder` +
-    `&orderId=${encodeURIComponent(orderId)}` +
-    `&name=${encodeURIComponent(name)}` +
-    `&force=${force}`;
-
-
-  const response =
-    await fetch(url);
-
-
-  const data =
-    await response.json();
-
-
-  if (
-    data.requiresConfirmation
-  ) {
-
-    showWarning(
-      data.shortages || []
-    );
-
-    return;
-  }
-
-
-  if (!data.success) {
-
-    alert(
-      data.error ||
-      "Withdrawal failed."
-    );
-
-    return;
-  }
-
-
-  alert(
-    `${orderId} withdrawn successfully.`
-  );
-
-}
-
-
-// =====================================================
-// SHORTAGE WARNING
-// =====================================================
-
-function showWarning(
-  shortages
-) {
-
-  const content =
-    document.getElementById(
-      "warningContent"
-    );
-
-
-  content.innerHTML = "";
-
-
-  shortages.forEach(item => {
-
-    const p =
-      document.createElement("p");
-
-
-    p.innerHTML =
-      `<strong>${escapeHtml(item.item)}</strong><br>` +
-      `Available: ${item.available}<br>` +
-      `Required: ${item.requested}<br>` +
-      `<strong>Shortfall: ${item.shortfall}</strong><br>` +
-      `New stock: ${item.newQty}`;
-
-
-    content.appendChild(p);
-
-  });
-
-
-  document
-    .getElementById(
-      "warningModal"
-    )
-    .style.display =
-      "flex";
-
-}
-
-
-function closeWarning() {
-
-  document
-    .getElementById(
-      "warningModal"
-    )
-    .style.display =
-      "none";
-
-}
-
-
-async function withdrawAnyway() {
-
-  closeWarning();
-
-  await withdrawCurrentOrder(
-    true
-  );
-
-}
-
-
-// =====================================================
-// EXISTING ORDERS
+// LOAD ORDERS
 // =====================================================
 
 async function loadOrders() {
@@ -1226,7 +1481,9 @@ async function loadOrders() {
     await response.json();
 
 
-  if (!data.success) {
+  if (
+    !data.success
+  ) {
     return;
   }
 
@@ -1235,12 +1492,20 @@ async function loadOrders() {
     data.orders || [];
 
 
-  renderOrders(orders);
+  renderOrders(
+    orders
+  );
 
 }
 
 
-function renderOrders(list) {
+// =====================================================
+// RENDER ORDER SELECTOR
+// =====================================================
+
+function renderOrders(
+  list
+) {
 
   const select =
     document.getElementById(
@@ -1248,31 +1513,58 @@ function renderOrders(list) {
     );
 
 
+  const current =
+    select.value;
+
+
   select.innerHTML = "";
 
 
-  list.forEach(order => {
+  list.forEach(
+    order => {
 
-    const option =
-      document.createElement(
-        "option"
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        order.orderId;
+
+
+      option.textContent =
+        `${order.orderId} — ${order.orderName}`;
+
+
+      select.appendChild(
+        option
       );
 
-
-    option.value =
-      order.orderId;
-
-
-    option.textContent =
-      `${order.orderId} — ${order.orderName}`;
+    }
+  );
 
 
-    select.appendChild(option);
+  if (
+    [...select.options]
+      .some(
+        option =>
+          option.value ===
+          current
+      )
+  ) {
 
-  });
+    select.value =
+      current;
+
+  }
 
 }
 
+
+// =====================================================
+// ORDER SEARCH
+// =====================================================
 
 function filterOrders() {
 
@@ -1287,43 +1579,37 @@ function filterOrders() {
 
 
   const filtered =
-    orders.filter(order => {
+    orders.filter(
+      order => {
 
-      return (
-        order.orderId
-          .toLowerCase()
-          .includes(search)
-        ||
-        order.orderName
-          .toLowerCase()
-          .includes(search)
-      );
+        return (
+          order.orderId
+            .toLowerCase()
+            .includes(
+              search
+            )
+          ||
+          order.orderName
+            .toLowerCase()
+            .includes(
+              search
+            )
+        );
 
-    });
-
-
-  renderOrders(filtered);
-
-}
-
-
-// =====================================================
-// VIEW SUMMARY
-// =====================================================
-
-async function viewCurrentOrderSummary() {
-
-  if (!currentOrderId) {
-    return;
-  }
+      }
+    );
 
 
-  await viewOrderSummary(
-    currentOrderId
+  renderOrders(
+    filtered
   );
 
 }
 
+
+// =====================================================
+// OPEN SELECTED ORDER
+// =====================================================
 
 async function viewSelectedOrderSummary() {
 
@@ -1338,7 +1624,7 @@ async function viewSelectedOrderSummary() {
   if (!orderId) {
 
     alert(
-      "Select an order."
+      "Select an Order."
     );
 
     return;
@@ -1353,25 +1639,304 @@ async function viewSelectedOrderSummary() {
 }
 
 
+// =====================================================
+// VIEW ORDER SUMMARY
+// =====================================================
+
 async function viewOrderSummary(
   orderId
 ) {
 
-  const response =
-    await fetch(
-      `${API_URL}?action=getOrderSummary&orderId=${encodeURIComponent(orderId)}&write=1`
+  try {
+
+    const response =
+      await fetch(
+        `${API_URL}?action=getOrderSummary` +
+        `&orderId=${encodeURIComponent(orderId)}` +
+        `&write=1`
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !data.success
+    ) {
+
+      alert(
+        data.error ||
+        "Could not load Order."
+      );
+
+      return;
+
+    }
+
+
+    currentViewedOrderId =
+      data.order.orderId;
+
+
+    currentOrderSummary =
+      data;
+
+
+    document
+      .getElementById(
+        "orderSummaryTitle"
+      )
+      .textContent =
+        `${data.order.orderId} — ${data.order.orderName}`;
+
+
+    document
+      .getElementById(
+        "orderMeta"
+      )
+      .innerHTML = `
+
+        <strong>
+          Created By:
+        </strong>
+
+        ${escapeHtml(data.order.createdBy)}
+
+        <br>
+
+        <strong>
+          Created At:
+        </strong>
+
+        ${escapeHtml(data.order.createdAt)}
+
+        <br>
+
+        <strong>
+          Notes:
+        </strong>
+
+        ${escapeHtml(data.order.notes || "—")}
+
+      `;
+
+
+    const table =
+      document.getElementById(
+        "orderSummaryTable"
+      );
+
+
+    table.innerHTML = "";
+
+
+    data.items.forEach(
+      item => {
+
+        const row =
+          document.createElement(
+            "tr"
+          );
+
+
+        if (
+          item.remainingToWithdraw === 0
+        ) {
+
+          row.classList
+            .add(
+              "complete"
+            );
+
+        }
+
+
+        row.innerHTML = `
+
+          <td>
+            <strong>
+              ${escapeHtml(item.item)}
+            </strong>
+          </td>
+
+          <td>
+            ${item.planned}
+          </td>
+
+          <td>
+            ${item.withdrawn}
+          </td>
+
+          <td>
+            ${item.returned}
+          </td>
+
+          <td>
+            ${item.expended}
+          </td>
+
+          <td>
+            <strong>
+              ${item.remainingToWithdraw}
+            </strong>
+          </td>
+
+          <td class="${item.overPlan > 0 ? "bad" : ""}">
+            ${item.overPlan}
+          </td>
+
+        `;
+
+
+        table.appendChild(
+          row
+        );
+
+      }
     );
 
 
-  const data =
-    await response.json();
+    // Pre-fill withdrawal name
+    // with creator only if blank.
+
+    const withdrawalName =
+      document.getElementById(
+        "withdrawalName"
+      );
 
 
-  if (!data.success) {
+    if (
+      !withdrawalName.value.trim()
+    ) {
+
+      withdrawalName.value =
+        data.order.createdBy || "";
+
+    }
+
+
+    updateWithdrawalButtons(
+      data.hasRemaining
+    );
+
+
+    renderPartialItems();
+
+
+    document
+      .getElementById(
+        "partialSection"
+      )
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "orderSummarySection"
+      )
+      .classList
+      .remove(
+        "hidden"
+      );
+
+
+    document
+      .getElementById(
+        "orderSummarySection"
+      )
+      .scrollIntoView({
+        behavior:
+          "smooth"
+      });
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
 
     alert(
-      data.error ||
-      "Could not load order."
+      "Could not load Order."
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// WITHDRAWAL BUTTON STATE
+// =====================================================
+
+function updateWithdrawalButtons(
+  hasRemaining
+) {
+
+  const allButton =
+    document.getElementById(
+      "withdrawAllButton"
+    );
+
+
+  const partialButton =
+    document.getElementById(
+      "partialButton"
+    );
+
+
+  if (
+    hasRemaining
+  ) {
+
+    allButton.disabled =
+      false;
+
+
+    partialButton.disabled =
+      false;
+
+
+    allButton.textContent =
+      "Withdraw All Remaining";
+
+  } else {
+
+    allButton.disabled =
+      true;
+
+
+    partialButton.disabled =
+      true;
+
+
+    allButton.textContent =
+      "Planned Items Fully Withdrawn";
+
+  }
+
+}
+
+
+// =====================================================
+// WITHDRAW ALL REMAINING
+// =====================================================
+
+async function withdrawAllRemaining(
+  force
+) {
+
+  if (
+    !currentViewedOrderId
+  ) {
+
+    alert(
+      "Open an Order first."
     );
 
     return;
@@ -1379,87 +1944,605 @@ async function viewOrderSummary(
   }
 
 
-  document
-    .getElementById(
-      "orderSummaryTitle"
-    )
-    .textContent =
-      `${data.order.orderId} — ${data.order.orderName}`;
+  const name =
+    document
+      .getElementById(
+        "withdrawalName"
+      )
+      .value
+      .trim();
+
+
+  if (!name) {
+
+    alert(
+      "Enter the name of the person withdrawing."
+    );
+
+    return;
+
+  }
+
+
+  pendingWithdrawalMode =
+    "all";
+
+
+  const url =
+    `${API_URL}?action=withdrawOrderRemaining` +
+    `&orderId=${encodeURIComponent(currentViewedOrderId)}` +
+    `&name=${encodeURIComponent(name)}` +
+    `&force=${force}`;
+
+
+  await processOrderWithdrawal(
+    url,
+    force
+  );
+
+}
+
+
+// =====================================================
+// SHOW PARTIAL WITHDRAWAL
+// =====================================================
+
+function showPartialWithdrawal() {
+
+  if (
+    !currentOrderSummary
+  ) {
+    return;
+  }
+
+
+  renderPartialItems();
 
 
   document
     .getElementById(
-      "orderMeta"
+      "partialSection"
     )
-    .innerHTML = `
+    .classList
+    .remove(
+      "hidden"
+    );
 
-      <p>
-        <strong>Created By:</strong>
-        ${escapeHtml(data.order.createdBy)}
-      </p>
-
-      <p>
-        <strong>Created At:</strong>
-        ${escapeHtml(data.order.createdAt)}
-      </p>
-
-    `;
+}
 
 
-  const table =
+// =====================================================
+// HIDE PARTIAL
+// =====================================================
+
+function hidePartialWithdrawal() {
+
+  document
+    .getElementById(
+      "partialSection"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+}
+
+
+// =====================================================
+// RENDER PARTIAL ITEMS
+// =====================================================
+
+function renderPartialItems() {
+
+  const container =
     document.getElementById(
-      "orderSummaryTable"
+      "partialItems"
     );
 
 
-  table.innerHTML = "";
+  container.innerHTML = "";
 
 
-  data.items.forEach(item => {
-
-    const row =
-      document.createElement("tr");
-
-
-    row.innerHTML = `
-
-      <td>
-        ${escapeHtml(item.item)}
-      </td>
-
-      <td>${item.planned}</td>
-
-      <td>${item.withdrawn}</td>
-
-      <td>${item.returned}</td>
-
-      <td>
-        <strong>${item.expended}</strong>
-      </td>
-
-    `;
+  if (
+    !currentOrderSummary
+  ) {
+    return;
+  }
 
 
-    table.appendChild(row);
+  currentOrderSummary
+    .items
+    .forEach(
+      item => {
 
-  });
+        if (
+          item.remainingToWithdraw <= 0
+        ) {
+          return;
+        }
+
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+
+        row.className =
+          "partial-row";
+
+
+        row.innerHTML = `
+
+          <div>
+
+            <strong>
+              ${escapeHtml(item.item)}
+            </strong>
+
+            <br>
+
+            Planned:
+            ${item.planned}
+
+            &nbsp;|&nbsp;
+
+            Withdrawn:
+            ${item.withdrawn}
+
+            &nbsp;|&nbsp;
+
+            Remaining:
+            ${item.remainingToWithdraw}
+
+          </div>
+
+
+          <input
+            type="number"
+            step="any"
+            min="0"
+            class="partialQty"
+            data-item="${escapeHtml(item.item)}"
+            value="${item.remainingToWithdraw}"
+          >
+
+        `;
+
+
+        container.appendChild(
+          row
+        );
+
+      }
+    );
+
+}
+
+
+// =====================================================
+// GET PARTIAL ITEMS
+// =====================================================
+
+function getPartialItems() {
+
+  const inputs =
+    document.querySelectorAll(
+      ".partialQty"
+    );
+
+
+  const items = [];
+
+
+  inputs.forEach(
+    input => {
+
+      const qty =
+        Number(
+          input.value
+        );
+
+
+      const item =
+        input.dataset.item;
+
+
+      if (
+        item &&
+        qty > 0
+      ) {
+
+        items.push({
+          item: item,
+          qty: qty
+        });
+
+      }
+
+    }
+  );
+
+
+  return items;
+
+}
+
+
+// =====================================================
+// SUBMIT PARTIAL WITHDRAWAL
+// =====================================================
+
+async function submitPartialWithdrawal(
+  force
+) {
+
+  if (
+    !currentViewedOrderId
+  ) {
+
+    alert(
+      "Open an Order first."
+    );
+
+    return;
+
+  }
+
+
+  const name =
+    document
+      .getElementById(
+        "withdrawalName"
+      )
+      .value
+      .trim();
+
+
+  if (!name) {
+
+    alert(
+      "Enter the name of the person withdrawing."
+    );
+
+    return;
+
+  }
+
+
+  const items =
+    getPartialItems();
+
+
+  if (
+    items.length === 0
+  ) {
+
+    alert(
+      "Enter at least one quantity to withdraw."
+    );
+
+    return;
+
+  }
+
+
+  pendingWithdrawalMode =
+    "partial";
+
+
+  const url =
+    `${API_URL}?action=batchWithdraw` +
+    `&name=${encodeURIComponent(name)}` +
+    `&orderId=${encodeURIComponent(currentViewedOrderId)}` +
+    `&force=${force}` +
+    `&items=${encodeURIComponent(JSON.stringify(items))}`;
+
+
+  await processOrderWithdrawal(
+    url,
+    force
+  );
+
+}
+
+
+// =====================================================
+// PROCESS ORDER WITHDRAWAL
+// =====================================================
+
+async function processOrderWithdrawal(
+  url,
+  force
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        url
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      data.requiresConfirmation
+    ) {
+
+      showWarning(
+        data.shortages || [],
+        data.planExcesses || []
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !data.success
+    ) {
+
+      alert(
+        data.error ||
+        "Withdrawal failed."
+      );
+
+      return;
+
+    }
+
+
+    alert(
+      "Withdrawal recorded successfully."
+    );
+
+
+    closeWarning();
+
+
+    hidePartialWithdrawal();
+
+
+    await viewOrderSummary(
+      currentViewedOrderId
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Withdrawal failed."
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// WARNING MODAL
+// =====================================================
+
+function showWarning(
+  shortages,
+  planExcesses
+) {
+
+  const stockContainer =
+    document.getElementById(
+      "stockWarnings"
+    );
+
+
+  const planContainer =
+    document.getElementById(
+      "planWarnings"
+    );
+
+
+  stockContainer.innerHTML = "";
+
+  planContainer.innerHTML = "";
+
+
+  if (
+    shortages.length > 0
+  ) {
+
+    stockContainer.innerHTML =
+      `<h4>Stock Shortfall</h4>`;
+
+
+    shortages.forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "warning-box";
+
+
+        div.innerHTML = `
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Available:
+          ${item.available}
+
+          <br>
+
+          Requested:
+          ${item.requested}
+
+          <br>
+
+          <strong>
+            Shortfall:
+            ${item.shortfall}
+          </strong>
+
+          <br>
+
+          Stock after withdrawal:
+          ${item.newQty}
+
+        `;
+
+
+        stockContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
+
+
+  if (
+    planExcesses.length > 0
+  ) {
+
+    planContainer.innerHTML =
+      `<h4>Order Plan Exceeded</h4>`;
+
+
+    planExcesses.forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+
+        div.className =
+          "plan-box";
+
+
+        div.innerHTML = `
+
+          <strong>
+            ${escapeHtml(item.item)}
+          </strong>
+
+          <br>
+
+          Planned:
+          ${item.planned}
+
+          <br>
+
+          Already withdrawn:
+          ${item.withdrawnSoFar}
+
+          <br>
+
+          Remaining planned:
+          ${item.remainingPlanned}
+
+          <br>
+
+          Requested now:
+          ${item.requested}
+
+          <br>
+
+          <strong>
+            Exceeds plan by:
+            ${item.exceedsBy}
+          </strong>
+
+        `;
+
+
+        planContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
 
 
   document
     .getElementById(
-      "orderSummarySection"
+      "warningModal"
     )
-    .classList
-    .remove("hidden");
+    .style.display =
+      "flex";
 
+}
+
+
+// =====================================================
+// CLOSE WARNING
+// =====================================================
+
+function closeWarning() {
 
   document
     .getElementById(
-      "orderSummarySection"
+      "warningModal"
     )
-    .scrollIntoView({
-      behavior: "smooth"
-    });
+    .style.display =
+      "none";
+
+}
+
+
+// =====================================================
+// WITHDRAW ANYWAY
+// =====================================================
+
+async function withdrawAnyway() {
+
+  closeWarning();
+
+
+  if (
+    pendingWithdrawalMode ===
+    "all"
+  ) {
+
+    await withdrawAllRemaining(
+      true
+    );
+
+    return;
+
+  }
+
+
+  if (
+    pendingWithdrawalMode ===
+    "partial"
+  ) {
+
+    await submitPartialWithdrawal(
+      true
+    );
+
+  }
 
 }
 
@@ -1468,14 +2551,33 @@ async function viewOrderSummary(
 // HTML SAFETY
 // =====================================================
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  return String(
+    value
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
